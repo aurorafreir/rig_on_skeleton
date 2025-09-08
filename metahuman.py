@@ -12,14 +12,14 @@ import time
 import pymel.core as pm
 
 # LOCAL APPLICATION IMPORTS
-from rigging.rig_on_skeleton import rig_on_skeleton as ros
+from rig_on_skeleton import rig_on_skeleton as ros
 
 reload(ros)
 
 
 # EXAMPLE CODE
 """
-from rigging.rig_on_skeleton import metahuman
+from rig_on_skeleton import metahuman
 from importlib import reload
 reload(metahuman)
 metahuman.run()

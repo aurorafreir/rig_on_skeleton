@@ -12,14 +12,14 @@ import pymel.core as pm
 from pymel.core import nt
 
 # LOCAL APPLICATION IMPORTS
-from rigging.rig_on_skeleton import rig_on_skeleton as ros
+from rig_on_skeleton import rig_on_skeleton as ros
 
 reload(ros)
 
 
 # EXAMPLE CODE
 """
-from rigging.rig_on_skeleton import brooke
+from rig_on_skeleton import brooke
 from importlib import reload
 reload(brooke)
 brooke.run()
