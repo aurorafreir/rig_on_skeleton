@@ -17,11 +17,11 @@ metahuman.run()
 
 ## Supported functionality:
 
-- ### Class based Main Rig and Limb system (`$Rig`)
-
+- ### Class based Main Rig and Limb system (`$Rig` and `$Limb`)
 - ### Class based controller creation (`$CtrlSet`)
-
 - ### Class based attribute creation (`$Attr`)
+- ### Automatic pole vector placement
+- ### Locking and Hiding of non-animation friendly attributes
 
 - ### (In Progress) Three Bone Limb (Arms/Legs) (`$ThreeBoneLimb`)::
   - ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png) (Working) FKIK
