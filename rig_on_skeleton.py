@@ -570,13 +570,19 @@ class Rig:
         self.driver_main_node.useOutlinerColor.set(1)
         self.driver_main_node.outlinerColor.set(driver_outliner_yellow)
 
-        # Lock and hide attributes on created groups
+        print(f"{time.perf_counter():.2}: finished ensure_setup_is_correct().")
+
+        return None
+
+    def finalise(self):
+        """
+        locks and hides attributes on main rig nodes
+        :return: None
+        """
         lock_hide_default_attrs(obj=self.main_grp)
         lock_hide_default_attrs(obj=self.rig_setup_grp)
         lock_hide_default_attrs(obj=self.ctls_grp)
         lock_hide_default_attrs(obj=self.driver_main_node)
-
-        print(f"{time.perf_counter():.2}: finished ensure_setup_is_correct().")
 
         return None
 

@@ -16,7 +16,6 @@ from rig_on_skeleton import rig_on_skeleton as ros
 
 reload(ros)
 
-
 # EXAMPLE CODE
 """
 from rig_on_skeleton import metahuman
@@ -27,16 +26,16 @@ metahuman.run()
 
 
 def run():
-
     print_errors = True
 
-    # FIRST SETUP #
+    # -- FIRST SETUP --
     rig = ros.Rig()
     rig.main_grp = "metahuman"
     rig.ensure_setup_is_correct()
 
     driver = "DRIVER"
 
+    # -- CONTROLLER SETUP --
     # ROOT CONTROLS #
     root_limb = ros.Limb()
     root_limb.limb_name = "root"
@@ -97,10 +96,6 @@ def run():
         worldSpace=True,
     )
 
-    # constraints #
-    pm.parentConstraint(root_ctl.ctl, "root_drv", maintainOffset=True)
-    pm.parentConstraint(hip_ctl.ctl, "pelvis_drv", maintainOffset=True)
-
     # add ctls to hip_limb.ctl attribute, and append hip_limb to rig.limbs
     hip_limb.ctls.extend([hip_ctl])
     rig.limbs.append(hip_limb)
@@ -159,16 +154,6 @@ def run():
         worldSpace=True,
     )
 
-    # NECK AND HEAD FINALISING
-    pm.parentConstraint(hip_ctl.ctl, neck_01.main_grp, maintainOffset=True)
-    pm.parentConstraint(neck_01.ctl, "neck_01_drv")
-    pm.parentConstraint(neck_02.ctl, "neck_02_drv")
-    pm.parentConstraint(head.ctl, "head_drv")
-
-    ros.lock_hide_default_attrs(neck_01.ctl, rotate=False)
-    ros.lock_hide_default_attrs(neck_02.ctl, rotate=False)
-    ros.lock_hide_default_attrs(head.ctl, rotate=False)
-
     # add ctls to neck_and_head_limb.ctl attribute, and append neck_and_head_limb to rig.limbs
     neck_and_head_limb.ctls.extend([neck_01, neck_02, head])
     rig.limbs.append(neck_and_head_limb)
@@ -224,13 +209,6 @@ def run():
 
     shoulder_r.ctls.append(scap_r)
     rig.limbs.append(shoulder_r)
-
-    # SHOULDERS FINALIZING
-    pm.parentConstraint(scap_l.ctl, "clavicle_l_drv", maintainOffset=True)
-    pm.parentConstraint(scap_r.ctl, "clavicle_r_drv", maintainOffset=True)
-
-    ros.lock_hide_default_attrs(scap_l.ctl, rotate=False)
-    ros.lock_hide_default_attrs(scap_r.ctl, rotate=False)
 
     # L HAND SETUP
     pv_l_main_grp, _, pv_l_placer = ros.place_temp_pv_locators(
@@ -356,14 +334,6 @@ def run():
     arm_l.fk_ctls = [upperarm_l_fk_ctl, lowerarm_l_fk_ctl, hand_l_fk_ctl]
     arm_l.driver_ctl = hand_l_drv_ctl.ctl
     arm_l.create_three_bone_limb()
-
-    pm.parentConstraint(arm_l.skin_joints[2], hand_l_drv_ctl.main_grp)
-
-    pm.parentConstraint(arm_l.pole_pin_upper_jnt, "upperarm_l_drv")
-    pm.parentConstraint(arm_l.pole_pin_lower_jnt, "lowerarm_l_drv")
-    pm.parentConstraint(arm_l.skin_joints[2], "hand_l_drv")
-
-    pm.parentConstraint(scap_l.ctl, upperarm_l_fk_ctl.main_grp, maintainOffset=True)
 
     # l arm twist
     ros.delete_if_exists("upperarm_twist_01_l_orientConstraint1_drv")
@@ -543,14 +513,6 @@ def run():
     arm_r.mirror = True
     arm_r.create_three_bone_limb()
 
-    pm.parentConstraint(arm_r.skin_joints[2], hand_r_drv_ctl.main_grp)
-
-    pm.parentConstraint(arm_r.pole_pin_upper_jnt, "upperarm_r_drv")
-    pm.parentConstraint(arm_r.pole_pin_lower_jnt, "lowerarm_r_drv")
-    pm.parentConstraint(arm_r.skin_joints[2], "hand_r_drv")
-
-    pm.parentConstraint(scap_r.ctl, upperarm_r_fk_ctl.main_grp, maintainOffset=True)
-
     # r arm twist
     ros.delete_if_exists("upperarm_twist_01_r_orientConstraint1_drv")
     ros.delete_if_exists("upperarm_twist_02_r_orientConstraint1_drv")
@@ -597,8 +559,53 @@ def run():
     )
     rig.limbs.append(arm_r)
 
-    # Arms attribute locking
-    for i in [
+    # -- CONTROLLER SETUP CONSTRAINTS --
+    # HIPS
+
+    # NECK AND HEAD
+    pm.parentConstraint(hip_ctl.ctl, neck_01.main_grp, maintainOffset=True)
+
+    # SHOULDERS
+    pm.parentConstraint(hip_ctl.ctl, scap_l.main_grp, maintainOffset=True)
+    pm.parentConstraint(hip_ctl.ctl, scap_r.main_grp, maintainOffset=True)
+
+    # ARMS
+    pm.parentConstraint(scap_l.ctl, upperarm_l_fk_ctl.main_grp, maintainOffset=True)
+    pm.parentConstraint(scap_r.ctl, upperarm_r_fk_ctl.main_grp, maintainOffset=True)
+    pm.parentConstraint(arm_l.skin_joints[2], hand_l_drv_ctl.main_grp)
+    pm.parentConstraint(arm_r.skin_joints[2], hand_r_drv_ctl.main_grp)
+
+    # -- CONTROLLER TO SKELETON CONSTRAINTS --
+    # HIPS
+    pm.parentConstraint(root_ctl.ctl, "root_drv", maintainOffset=True)
+    pm.parentConstraint(hip_ctl.ctl, "pelvis_drv", maintainOffset=True)
+    # NECK AND HEAD
+    pm.parentConstraint(neck_01.ctl, "neck_01_drv")
+    pm.parentConstraint(neck_02.ctl, "neck_02_drv")
+    pm.parentConstraint(head.ctl, "head_drv")
+    # SHOULDERS
+    pm.parentConstraint(scap_l.ctl, "clavicle_l_drv", maintainOffset=True)
+    pm.parentConstraint(scap_r.ctl, "clavicle_r_drv", maintainOffset=True)
+    # ARMS
+    pm.parentConstraint(arm_l.pole_pin_upper_jnt, "upperarm_l_drv")
+    pm.parentConstraint(arm_l.pole_pin_lower_jnt, "lowerarm_l_drv")
+    pm.parentConstraint(arm_l.skin_joints[2], "hand_l_drv")
+    pm.parentConstraint(arm_r.pole_pin_upper_jnt, "upperarm_r_drv")
+    pm.parentConstraint(arm_r.pole_pin_lower_jnt, "lowerarm_r_drv")
+    pm.parentConstraint(arm_r.skin_joints[2], "hand_r_drv")
+
+    # -- ATTRIBUTE FINALISING/LOCKING/HIDING --
+    # HIPS
+
+    # NECK AND HEAD
+    ros.lock_hide_default_attrs(neck_01.ctl, rotate=False)
+    ros.lock_hide_default_attrs(neck_02.ctl, rotate=False)
+    ros.lock_hide_default_attrs(head.ctl, rotate=False)
+    # SHOULDERS
+    ros.lock_hide_default_attrs(scap_l.ctl, rotate=False)
+    ros.lock_hide_default_attrs(scap_r.ctl, rotate=False)
+    # ARMS
+    for control in [
         upperarm_l_fk_ctl.ctl,
         lowerarm_l_fk_ctl.ctl,
         hand_l_fk_ctl.ctl,
@@ -606,16 +613,16 @@ def run():
         lowerarm_r_fk_ctl.ctl,
         hand_r_fk_ctl.ctl,
     ]:
-        ros.lock_hide_default_attrs(i, rotate=False)
-    for i in [hand_l_pv_ctl.ctl, hand_r_pv_ctl.ctl]:
-        ros.lock_hide_default_attrs(i, rotate=False, translate=False)
-    for i in [hand_l_ik_ctl.ctl, hand_r_ik_ctl.ctl]:
-        ros.lock_hide_default_attrs(i, rotate=False, translate=False)
-    for i in [hand_l_drv_ctl.ctl, hand_r_drv_ctl.ctl]:
-        ros.lock_hide_default_attrs(i)
-
-    pm.parentConstraint(hip_ctl.ctl, scap_l.main_grp, maintainOffset=True)
-    pm.parentConstraint(hip_ctl.ctl, scap_r.main_grp, maintainOffset=True)
+        ros.lock_hide_default_attrs(control, rotate=False)  # FK CONTROLS
+    for control in [hand_l_pv_ctl.ctl, hand_r_pv_ctl.ctl]:  # PVs
+        ros.lock_hide_default_attrs(control, rotate=False, translate=False)
+    for control in [hand_l_ik_ctl.ctl, hand_r_ik_ctl.ctl]:  # IK HAND
+        ros.lock_hide_default_attrs(control, rotate=False, translate=False)
+    for control in [hand_l_drv_ctl.ctl, hand_r_drv_ctl.ctl]:  # HAND DRIVER
+        ros.lock_hide_default_attrs(control)
+    # RIG
+    rig.rig_setup_grp.visibility.set(0)
+    rig.finalise()
 
     # FINALISING
     pm.delete(pv_l_main_grp, pv_r_main_grp)
