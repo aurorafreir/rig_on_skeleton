@@ -35,6 +35,8 @@ def run():
 
     driver = "DRIVER"
 
+    pm.refresh()
+
     # -- CONTROLLER SETUP --
     # ROOT CONTROLS #
     root_limb = ros.Limb()
@@ -73,6 +75,8 @@ def run():
     root_limb.ctls.extend([global_ctl, global_off_ctl, root_ctl])
     rig.limbs.append(root_limb)
 
+    pm.refresh()
+
     # HIP CONTROLS #
     hip_limb = ros.Limb()
     hip_limb.limb_name = "hip"
@@ -99,6 +103,8 @@ def run():
     # add ctls to hip_limb.ctl attribute, and append hip_limb to rig.limbs
     hip_limb.ctls.extend([hip_ctl])
     rig.limbs.append(hip_limb)
+
+    pm.refresh()
 
     # NECK AND HEAD
     neck_and_head_limb = ros.Limb()
@@ -158,6 +164,8 @@ def run():
     neck_and_head_limb.ctls.extend([neck_01, neck_02, head])
     rig.limbs.append(neck_and_head_limb)
 
+    pm.refresh()
+
     # SHOULDERS
     shoulder_l = ros.Limb()
     shoulder_l.limb_name = "shoulder_l"
@@ -184,6 +192,8 @@ def run():
     shoulder_l.ctls.append(scap_l)
     rig.limbs.append(shoulder_l)
 
+    pm.refresh()
+
     shoulder_r = ros.Limb()
     shoulder_r.limb_name = "shoulder_r"
     shoulder_r.rig_parent = rig.rig_setup_grp
@@ -209,6 +219,8 @@ def run():
 
     shoulder_r.ctls.append(scap_r)
     rig.limbs.append(shoulder_r)
+
+    pm.refresh()
 
     # L HAND SETUP
     pv_l_main_grp, _, pv_l_placer = ros.place_temp_pv_locators(
@@ -338,6 +350,7 @@ def run():
     # l arm twist
     ros.delete_if_exists("upperarm_twist_01_l_orientConstraint1_drv")
     ros.delete_if_exists("upperarm_twist_02_l_orientConstraint1_drv")
+    ros.delete_if_exists("upperarm_correctiveRoot_l_drv_parentConstraint1")
 
     upperarm_twist_01_oc = pm.orientConstraint(
         arm_l.noroll_upper_joint,
@@ -360,13 +373,13 @@ def run():
     upperarm_twist_02_oc.attr(f"{arm_l.noroll_upper_joint}W0").set(0.4)
     upperarm_twist_02_oc.attr(f"{arm_l.pole_pin_lower_jnt}W1").set(0.6)
 
-    shoulder_l_orient_const = pm.orientConstraint(
-        arm_l.dup_parent_joint,
-        arm_l.pole_pin_upper_jnt,
-        pm.PyNode("upperarm_correctiveRootCor_l_drv"),
-        maintainOffset=True,
-    )
-    shoulder_l_orient_const.interpType.set(2)
+    # shoulder_l_orient_const = pm.orientConstraint(
+    #     arm_l.dup_parent_joint,
+    #     arm_l.pole_pin_upper_jnt,
+    #     pm.PyNode("upperarm_correctiveRootCor_l_drv"),
+    #     maintainOffset=True,
+    # )
+    # shoulder_l_orient_const.interpType.set(2)
 
     # add ctls to arm_l.ctl attribute, and append arm_l to rig.limbs
     arm_l.ctls.extend(
@@ -380,6 +393,8 @@ def run():
         ]
     )
     rig.limbs.append(arm_l)
+
+    pm.refresh()
 
     # R HAND SETUP
     pv_r_main_grp, _, pv_r_placer = ros.place_temp_pv_locators(
@@ -516,6 +531,7 @@ def run():
     # r arm twist
     ros.delete_if_exists("upperarm_twist_01_r_orientConstraint1_drv")
     ros.delete_if_exists("upperarm_twist_02_r_orientConstraint1_drv")
+    ros.delete_if_exists("upperarm_correctiveRoot_r_drv_parentConstraint1")
 
     upperarm_twist_01_oc = pm.orientConstraint(
         arm_r.noroll_upper_joint,
@@ -538,13 +554,13 @@ def run():
     upperarm_twist_02_oc.attr(f"{arm_r.noroll_upper_joint}W0").set(0.4)
     upperarm_twist_02_oc.attr(f"{arm_r.pole_pin_lower_jnt}W1").set(0.6)
 
-    shoulder_r_orient_const = pm.orientConstraint(
-        arm_r.dup_parent_joint,
-        arm_r.pole_pin_upper_jnt,
-        pm.PyNode("upperarm_correctiveRootCor_r_drv"),
-        maintainOffset=True,
-    )
-    shoulder_r_orient_const.interpType.set(2)
+    # shoulder_r_orient_const = pm.orientConstraint(
+    #     arm_r.dup_upperarm_joint,
+    #     arm_r.pole_pin_upper_jnt,
+    #     pm.PyNode("upperarm_correctiveRootCor_r_drv"),
+    #     maintainOffset=True,
+    # )
+    # shoulder_r_orient_const.interpType.set(2)
 
     # add ctls to arm_r.ctl attribute, and append arm_r to rig.limbs
     arm_r.ctls.extend(
@@ -586,6 +602,18 @@ def run():
     # SHOULDERS
     pm.parentConstraint(scap_l.ctl, "clavicle_l_drv", maintainOffset=True)
     pm.parentConstraint(scap_r.ctl, "clavicle_r_drv", maintainOffset=True)
+
+    pm.orientConstraint(arm_l.dup_parent_joint, "upperarm_correctiveRoot_l_drv", maintainOffset=True)
+    shoulder_l_twist_half_orientconstraint = pm.orientConstraint(arm_l.pole_pin_upper_jnt, arm_l.dup_upperarm_joint,
+                                                                 "upperarm_correctiveRootCor_l_drv",
+                                                                 maintainOffset=True)
+    shoulder_l_twist_half_orientconstraint.interpType.set(2)
+    pm.orientConstraint(arm_r.dup_parent_joint, "upperarm_correctiveRoot_r_drv", maintainOffset=True)
+    shoulder_r_twist_half_orientconstraint = pm.orientConstraint(arm_r.pole_pin_upper_jnt, arm_r.dup_upperarm_joint,
+                                                                 "upperarm_correctiveRootCor_r_drv",
+                                                                 maintainOffset=True)
+    shoulder_r_twist_half_orientconstraint.interpType.set(2)
+
     # ARMS
     pm.parentConstraint(arm_l.pole_pin_upper_jnt, "upperarm_l_drv")
     pm.parentConstraint(arm_l.pole_pin_lower_jnt, "lowerarm_l_drv")
@@ -621,7 +649,7 @@ def run():
     for control in [hand_l_drv_ctl.ctl, hand_r_drv_ctl.ctl]:  # HAND DRIVER
         ros.lock_hide_default_attrs(control)
     # RIG
-    rig.rig_setup_grp.visibility.set(0)
+    # rig.rig_setup_grp.visibility.set(0)
     rig.finalise()
 
     # FINALISING

@@ -26,11 +26,11 @@ driver_col = white
 
 
 def place_temp_pv_locators(
-    name: str,
-    upper_joint: pm.PyNode,
-    middle_joint: pm.PyNode,
-    lower_joint: pm.PyNode,
-    pv_x_multiplier: float = 1,
+        name: str,
+        upper_joint: pm.PyNode,
+        middle_joint: pm.PyNode,
+        lower_joint: pm.PyNode,
+        pv_x_multiplier: float = 1,
 ):
     """
     Makes temporary locators for placement of pole vector objects
@@ -76,14 +76,14 @@ def get_top_joint(joints: list):
 
 
 def lock_hide_default_attrs(
-    obj: pm.nt.Transform,
-    translate=True,
-    rotate=True,
-    scale=True,
-    visibility=True,
-    custom=None,
-    lock=True,
-    hide=True,
+        obj: pm.nt.Transform,
+        translate=True,
+        rotate=True,
+        scale=True,
+        visibility=True,
+        custom=None,
+        lock=True,
+        hide=True,
 ):
     """
 
@@ -114,10 +114,10 @@ def lock_hide_default_attrs(
 
 
 def set_up_space_switching(
-    driver_obj: pm.nt.Transform,
-    attr: str,
-    driven_obj: pm.nt.Transform,
-    space_objects: list,
+        driver_obj: pm.nt.Transform,
+        attr: str,
+        driven_obj: pm.nt.Transform,
+        space_objects: list,
 ):
     """
 
@@ -156,14 +156,14 @@ def set_up_space_switch(self):
 
 
 def fkik_quat_setup(
-    name: str,
-    input_obj_a=pm.nt.Transform,
-    input_obj_b=pm.nt.Transform,
-    output_obj=pm.nt.Transform,
-    slerp_t_obj=pm.nt.Transform,
-    slerp_t_attr_str="",
-    slerp_t_attr=None,
-    slerp_t_attr_flip=False,
+        name: str,
+        input_obj_a=pm.nt.Transform,
+        input_obj_b=pm.nt.Transform,
+        output_obj=pm.nt.Transform,
+        slerp_t_obj=pm.nt.Transform,
+        slerp_t_attr_str="",
+        slerp_t_attr=None,
+        slerp_t_attr_flip=False,
 ):
     """
     Creates a quaternion based Slerp setup, used in this case for FKIK switching
@@ -253,18 +253,18 @@ def weighted_floatmath_attr_connect(in_obj, out_obj, attrs: list, weight: float 
 
 class Attr:
     def __init__(
-        self,
-        main_object: pm.nt.Transform,
-        attr_name: "",
-        driver_prefix: "",
-        nice_name="",
-        short_name="",
-        long_name="",
-        attr_type="float",
-        dummy_attr=False,
-        float_min=None,
-        float_max=None,
-        proxy_objects=None,
+            self,
+            main_object: pm.nt.Transform,
+            attr_name: "",
+            driver_prefix: "",
+            nice_name="",
+            short_name="",
+            long_name="",
+            attr_type="float",
+            dummy_attr=False,
+            float_min=None,
+            float_max=None,
+            proxy_objects=None,
     ):
 
         self.main_object = main_object
@@ -340,17 +340,17 @@ class Attr:
 
 class CtrlSet:
     def __init__(
-        self,
-        ctl_name="",
-        offset=False,
-        spaceswitch=False,
-        mirror=False,
-        ctl_shape="",
-        shape_size: int or list = 1,
-        transform_shape=[0, 0, 0],
-        colour=None,
-        parent=None,
-        spaces=None,
+            self,
+            ctl_name="",
+            offset=False,
+            spaceswitch=False,
+            mirror=False,
+            ctl_shape="",
+            shape_size: int or list = 1,
+            transform_shape=[0, 0, 0],
+            colour=None,
+            parent=None,
+            spaces=None,
     ):
         self.ctl_name = ctl_name
         self.offset = offset
@@ -656,20 +656,20 @@ class Limb:
 
 class ThreeBoneLimb(Limb):
     def __init__(
-        self,
-        input_joints: list = None,
-        # fkik:bool=True,  # assuming fkik is true tbh, who doesn't want fkik at the least :3
-        stretch: bool = True,
-        stretch_modifiers: bool = True,
-        pole_lock: bool = True,
-        pole_vec_obj: pm.nt.Transform = None,
-        bend_setup: bool = True,
-        ikfk_suffix_replace: str = "_drv",
-        ik_ctl: pm.nt.Transform = None,
-        ik_pv_ctl: pm.nt.Transform = None,
-        fk_ctls: list = None,
-        driver_ctl: pm.nt.Transform = None,
-        elbow_ctl: pm.nt.Transform = None,
+            self,
+            input_joints: list = None,
+            # fkik:bool=True,  # assuming fkik is true tbh, who doesn't want fkik at the least :3
+            stretch: bool = True,
+            stretch_modifiers: bool = True,
+            pole_lock: bool = True,
+            pole_vec_obj: pm.nt.Transform = None,
+            bend_setup: bool = True,
+            ikfk_suffix_replace: str = "_drv",
+            ik_ctl: pm.nt.Transform = None,
+            ik_pv_ctl: pm.nt.Transform = None,
+            fk_ctls: list = None,
+            driver_ctl: pm.nt.Transform = None,
+            elbow_ctl: pm.nt.Transform = None,
     ):
         Limb.__init__(self)
 
@@ -722,6 +722,7 @@ class ThreeBoneLimb(Limb):
             i.rename(i.replace(self.ikfk_suffix_replace, "_skin"))
         self.skin_joints[0].rename(self.skin_joints[0][:-1])
 
+        # Duplicate hierarchy parent joint, constrained to upper control to move with upper control. Used for NoRoll jnt
         self.dup_parent_joint = pm.duplicate(
             pm.PyNode(self.input_joints[0]).getParent(), parentOnly=True
         )[0]
@@ -731,15 +732,31 @@ class ThreeBoneLimb(Limb):
         self.dup_parent_joint.rename(self.dup_parent_joint.name()[:-1])
         pm.parentConstraint(self.rig_upper_obj, self.dup_parent_joint)
 
+        # Duplicate UpperArm joint, used as part of Shoulder NoRoll and Shoulder Twist joints.
+        self.dup_upperarm_joint = pm.duplicate(pm.PyNode(self.input_joints[0]), parentOnly=True)[0]
+        pm.parent(self.dup_upperarm_joint, self.dup_parent_joint)
+        self.dup_upperarm_joint.rename(self.dup_upperarm_joint.replace(self.ikfk_suffix_replace, "_upper_dup"))
+
         if self.verbose:
             print(f"Created joints for {self.limb_name}")
 
-        # No Roll upper joint. Orient constrained to upper skin joint on Y and Z.
+        # No Roll joints.
         self.noroll_upper_joint = pm.duplicate(self.input_joints[0], parentOnly=True)[0]
         self.noroll_upper_joint.rename(
             self.noroll_upper_joint.replace(self.ikfk_suffix_replace, "_noroll")
         )
         self.noroll_upper_joint.rename(self.noroll_upper_joint[:-1])
+
+        self.noroll_lower_joint = pm.duplicate(self.input_joints[1], parentOnly=True)[0]
+        self.noroll_lower_joint.rename(
+            self.noroll_lower_joint.replace(self.ikfk_suffix_replace, "_noroll")
+        )
+        self.noroll_lower_joint.rename(self.noroll_lower_joint[:-1])
+        pm.parent(self.noroll_lower_joint, self.noroll_upper_joint)
+
+        self.noroll_sc_ik = pm.ikHandle(name=f"{self.limb_name}_noroll_ikh", startJoint=self.noroll_upper_joint,
+                                        endEffector=self.noroll_lower_joint, solver="ikSCsolver")
+        pm.parent(self.noroll_sc_ik[0], self.rig_setup_grp)
 
         if self.verbose:
             print(f"Created noroll joint for {self.limb_name}")
@@ -969,17 +986,10 @@ class ThreeBoneLimb(Limb):
                 f"{lower_pin_point_const}.{self.pole_vec_obj}W1",
             )
 
+            # NoRoll Twist constraint from lower pole pin joint to single chain ikhandle
+            pm.pointConstraint(self.pole_pin_lower_jnt, self.noroll_sc_ik[0])
+
         if self.bend_setup:
             pass
-
-        # NoRoll joint aim constraint for rotation setup
-        noroll_aim_const = pm.aimConstraint(
-            self.pole_pin_lower_jnt,
-            self.noroll_upper_joint,
-            worldUpType="objectrotation",
-            worldUpObject=self.dup_parent_joint,
-            aimVector=self.aim_axis,
-            maintainOffset=True,
-        )
 
         return None
