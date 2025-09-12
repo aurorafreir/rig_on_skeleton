@@ -507,6 +507,158 @@ def run():
     )
     rig.limbs.append(arm_r)
 
+    # L LEG SETUP
+    pv_l_main_grp, _, pv_l_placer = ros.place_temp_pv_locators(
+        name="l_leg",
+        upper_joint=pm.PyNode("thigh_l_drv"),
+        middle_joint=pm.PyNode("knee_l_drv"),
+        lower_joint=pm.PyNode("foot_l_drv"),
+        pv_x_multiplier=.7
+    )
+
+    leg_l = ros.DigiLegLimb()
+    leg_l.limb_name = "leg_l"
+    leg_l.input_joints = ["thigh_l_drv", "knee_l_drv", "ankle_l_drv", "foot_l_drv"]
+    leg_l.ikfk_suffix_replace = "_drv"
+    leg_l.driver_object = driver
+    leg_l.rig_parent = rig.rig_setup_grp
+    leg_l.ctl_parent = rig.ctls_grp
+    leg_l.rig_upper_obj = hip_ctl.ctl
+    leg_l.verbose = print_errors
+    leg_l.create_limb_setup()
+    # CONTROLS #
+    # driver
+    foot_l_drv_ctl = ros.CtrlSet(
+        ctl_name="foot_l_driver",
+        ctl_shape="star",
+        offset=True,
+        spaceswitch=True,
+        shape_size=2,
+        transform_shape=[5, 0, 5],
+        parent=leg_l.rig_ctls_grp,
+        colour=ros.driver_col,
+    )
+    foot_l_drv_ctl.create_ctl()
+    pm.xform(
+        foot_l_drv_ctl.main_grp,
+        matrix=pm.xform("foot_l_drv", matrix=True, query=True, worldSpace=True),
+        worldSpace=True,
+    )
+    # ik
+    foot_l_ik_ctl = ros.CtrlSet(
+        ctl_name="foot_l_ik",
+        ctl_shape="box",
+        offset=True,
+        spaceswitch=True,
+        shape_size=7,
+        parent=leg_l.rig_ctls_grp,
+        colour=ros.left_col,
+    )
+    foot_l_ik_ctl.create_ctl()
+    pm.xform(
+        foot_l_ik_ctl.main_grp,
+        matrix=pm.xform("foot_l_drv", matrix=True, query=True, worldSpace=True),
+        worldSpace=True,
+    )
+    # pv
+    foot_l_pv_ctl = ros.CtrlSet(
+        ctl_name="foot_l_pv",
+        ctl_shape="star",
+        offset=True,
+        spaceswitch=True,
+        shape_size=3,
+        parent=leg_l.rig_ctls_grp,
+        colour=ros.left_col,
+        mirror=True,
+    )
+    foot_l_pv_ctl.create_ctl()
+    pm.xform(
+        foot_l_pv_ctl.main_grp,
+        matrix=pm.xform(pv_l_placer, matrix=True, query=True, worldSpace=True),
+        worldSpace=True,
+    )
+    # thigh_l_fk
+    thigh_l_fk_ctl = ros.CtrlSet(
+        ctl_name="thigh_l_fk",
+        ctl_shape="box",
+        offset=True,
+        spaceswitch=True,
+        shape_size=7,
+        parent=leg_l.rig_ctls_grp,
+        colour=ros.left_col,
+    )
+    thigh_l_fk_ctl.create_ctl()
+    pm.xform(
+        thigh_l_fk_ctl.main_grp,
+        matrix=pm.xform("thigh_l_drv", matrix=True, query=True, worldSpace=True),
+        worldSpace=True,
+    )
+    # knee_l_fk
+    knee_l_fk_ctl = ros.CtrlSet(
+        ctl_name="knee_l_fk",
+        ctl_shape="box",
+        offset=True,
+        spaceswitch=True,
+        shape_size=7,
+        parent=thigh_l_fk_ctl.ctl,
+        colour=ros.left_col,
+    )
+    knee_l_fk_ctl.create_ctl()
+    pm.xform(
+        knee_l_fk_ctl.main_grp,
+        matrix=pm.xform("knee_l_drv", matrix=True, query=True, worldSpace=True),
+        worldSpace=True,
+    )
+    # ankle_l_fk
+    ankle_l_fk_ctl = ros.CtrlSet(
+        ctl_name="ankle_l_fk",
+        ctl_shape="box",
+        offset=True,
+        spaceswitch=True,
+        shape_size=5,
+        parent=knee_l_fk_ctl.ctl,
+        colour=ros.left_col,
+    )
+    ankle_l_fk_ctl.create_ctl()
+    pm.xform(
+        ankle_l_fk_ctl.main_grp,
+        matrix=pm.xform("ankle_l_drv", matrix=True, query=True, worldSpace=True),
+        worldSpace=True,
+    )
+    # foot_l_fk
+    foot_l_fk_ctl = ros.CtrlSet(
+        ctl_name="foot_l_fk",
+        ctl_shape="box",
+        offset=True,
+        spaceswitch=True,
+        shape_size=5,
+        parent=knee_l_fk_ctl.ctl,
+        colour=ros.left_col,
+    )
+    foot_l_fk_ctl.create_ctl()
+    pm.xform(
+        foot_l_fk_ctl.main_grp,
+        matrix=pm.xform("foot_l_drv", matrix=True, query=True, worldSpace=True),
+        worldSpace=True,
+    )
+
+    leg_l.pole_vec_obj = foot_l_pv_ctl.ctl
+    leg_l.ik_ctl = hand_l_ik_ctl
+    leg_l.ik_pv_ctl = foot_l_pv_ctl
+    leg_l.fk_ctls = [thigh_l_fk_ctl, knee_l_fk_ctl, ankle_l_fk_ctl, foot_l_fk_ctl]
+    leg_l.driver_ctl = foot_l_drv_ctl.ctl
+    leg_l.create_digi_bone_limb()
+
+    # add ctls to arm_l.ctl attribute, and append arm_l to rig.limbs
+    leg_l.ctls.extend(
+        [
+
+        ]
+    )
+    rig.limbs.append(leg_l)
+
+    pm.refresh()
+
     # -- CONTROLLER SETUP CONSTRAINTS --
     # HIPS
 
@@ -569,6 +721,27 @@ def run():
         ros.lock_hide_default_attrs(control, rotate=False, translate=False)
     for control in [hand_l_drv_ctl.ctl, hand_r_drv_ctl.ctl]:  # HAND DRIVER
         ros.lock_hide_default_attrs(control)
+    # Legs
+    for control in [
+        thigh_l_fk_ctl.ctl,
+        knee_l_fk_ctl.ctl,
+        ankle_l_fk_ctl.ctl,
+        foot_l_fk_ctl.ctl,
+        # thigh_r_fk_ctl.ctl,
+        # knee_r_fk_ctl.ctl,
+        # ankle_r_fk_ctl.ctl,
+        # foot_r_fk_ctl.ctl,
+
+    ]:
+        ros.lock_hide_default_attrs(control, rotate=False)  # FK CONTROLS
+    for control in [foot_l_pv_ctl.ctl]:  # PVs
+        ros.lock_hide_default_attrs(control, rotate=False, translate=False)
+    for control in [foot_l_ik_ctl.ctl]:  # IK HAND
+        ros.lock_hide_default_attrs(control, rotate=False, translate=False)
+    for control in [foot_l_drv_ctl.ctl]:  # HAND DRIVER
+        ros.lock_hide_default_attrs(control)
+
+
     # RIG
     # rig.rig_setup_grp.visibility.set(0)
     rig.finalise()
