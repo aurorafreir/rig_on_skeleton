@@ -223,7 +223,7 @@ def run():
     pm.refresh()
 
     # L HAND SETUP
-    pv_l_main_grp, _, pv_l_placer = ros.place_temp_pv_locators(
+    arm_pv_l_main_grp, _, arm_pv_l_placer = ros.place_temp_pv_locators(
         name="l_arm",
         upper_joint=pm.PyNode("upperarm_l_drv"),
         middle_joint=pm.PyNode("lowerarm_l_drv"),
@@ -288,7 +288,7 @@ def run():
     hand_l_pv_ctl.create_ctl()
     pm.xform(
         hand_l_pv_ctl.main_grp,
-        matrix=pm.xform(pv_l_placer, matrix=True, query=True, worldSpace=True),
+        matrix=pm.xform(arm_pv_l_placer, matrix=True, query=True, worldSpace=True),
         worldSpace=True,
     )
     # upperarm_l_fk
@@ -363,7 +363,7 @@ def run():
     pm.refresh()
 
     # R HAND SETUP
-    pv_r_main_grp, _, pv_r_placer = ros.place_temp_pv_locators(
+    arm_pv_r_main_grp, _, arm_pv_r_placer = ros.place_temp_pv_locators(
         name="r_arm",
         upper_joint=pm.PyNode("upperarm_l_drv"),
         middle_joint=pm.PyNode("lowerarm_l_drv"),
@@ -429,7 +429,7 @@ def run():
     hand_r_pv_ctl.create_ctl()
     pm.xform(
         hand_r_pv_ctl.main_grp,
-        matrix=pm.xform(pv_r_placer, matrix=True, query=True, worldSpace=True),
+        matrix=pm.xform(arm_pv_r_placer, matrix=True, query=True, worldSpace=True),
         worldSpace=True,
     )
     # upperarm_r_fk
@@ -508,7 +508,7 @@ def run():
     rig.limbs.append(arm_r)
 
     # L LEG SETUP
-    pv_l_main_grp, _, pv_l_placer = ros.place_temp_pv_locators(
+    leg_pv_l_main_grp, _, leg_pv_l_placer = ros.place_temp_pv_locators(
         name="l_leg",
         upper_joint=pm.PyNode("thigh_l_drv"),
         middle_joint=pm.PyNode("knee_l_drv"),
@@ -574,7 +574,7 @@ def run():
     foot_l_pv_ctl.create_ctl()
     pm.xform(
         foot_l_pv_ctl.main_grp,
-        matrix=pm.xform(pv_l_placer, matrix=True, query=True, worldSpace=True),
+        matrix=pm.xform(leg_pv_l_placer, matrix=True, query=True, worldSpace=True),
         worldSpace=True,
     )
     # thigh_l_fk
@@ -747,7 +747,7 @@ def run():
     rig.finalise()
 
     # FINALISING
-    pm.delete(pv_l_main_grp, pv_r_main_grp)
+    pm.delete(arm_pv_l_main_grp, arm_pv_r_main_grp, leg_pv_l_main_grp)
 
     print(f"{time.perf_counter():.2f}: Finished building '{rig.main_grp}'")
 
