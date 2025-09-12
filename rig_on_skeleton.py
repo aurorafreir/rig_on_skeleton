@@ -28,7 +28,7 @@ driver_col = white
 def place_temp_pv_locators(
         name: str,
         upper_joint: pm.PyNode,
-        middle_joint: pm.PyNode,
+        middle_joint: pm.PyNode or list,
         lower_joint: pm.PyNode,
         pv_x_multiplier: float = 1,
 ):
@@ -629,6 +629,15 @@ class Limb:
 
         self.ctls = []
 
+        self.input_joints: list = None,
+        self.ikfk_suffix_replace: str = "_drv",
+        self.ik_ctl: pm.nt.Transform = None,
+        self.ik_pv_ctl: pm.nt.Transform = None,
+        self.fk_ctls: list = None,
+        self.driver_ctl: pm.nt.Transform = None,
+
+        self.aim_axis: list = [1, 0, 0]
+
         self.mirror = False
         self.aim_axis = None
 
@@ -653,41 +662,65 @@ class Limb:
 
         return None
 
+    def set_aim_axis(self):
+        """
+
+        :return: None
+        """
+        self.aim_axis = [-1, 0, 0] if self.mirror else [1, 0, 0]
+        return None
+
+    def create_fkik_joints(self):
+        """
+
+        :return: None
+        """
+        self.fk_joints = pm.duplicate(self.input_joints, parentOnly=True)
+        for i in self.fk_joints:
+            i.rename(i.replace(self.ikfk_suffix_replace, "_fk"))
+        self.fk_joints[0].rename(self.fk_joints[0][:-1])
+        self.ik_joints = pm.duplicate(self.input_joints, parentOnly=True)
+        for i in self.ik_joints:
+            i.rename(i.replace(self.ikfk_suffix_replace, "_ik"))
+        self.ik_joints[0].rename(self.ik_joints[0][:-1])
+        self.skin_joints = pm.duplicate(self.input_joints, parentOnly=True)
+        for i in self.skin_joints:
+            i.rename(i.replace(self.ikfk_suffix_replace, "_skin"))
+        self.skin_joints[0].rename(self.skin_joints[0][:-1])
+
+        pm.parent(self.fk_joints[0], self.rig_setup_grp)
+        pm.parent(self.ik_joints[0], self.rig_setup_grp)
+        pm.parent(self.skin_joints[0], self.rig_setup_grp)
+
+        return None
+
+    def set_upper_object(self):
+        self.rig_upper_obj = (
+            self.rig_upper_obj if self.rig_upper_obj else self.ctl_parent
+        )
+
+
 
 class ThreeBoneLimb(Limb):
     def __init__(
             self,
-            input_joints: list = None,
-            # fkik:bool=True,  # assuming fkik is true tbh, who doesn't want fkik at the least :3
             stretch: bool = True,
             stretch_modifiers: bool = True,
             pole_lock: bool = True,
             pole_vec_obj: pm.nt.Transform = None,
             bend_setup: bool = True,
-            ikfk_suffix_replace: str = "_drv",
-            ik_ctl: pm.nt.Transform = None,
-            ik_pv_ctl: pm.nt.Transform = None,
-            fk_ctls: list = None,
-            driver_ctl: pm.nt.Transform = None,
             elbow_ctl: pm.nt.Transform = None,
     ):
         Limb.__init__(self)
 
         # TODO AFOX pole vec pin joints
         # TODO AFOX noroll upper joint
-
-        self.input_joints = input_joints
         # self.fkik = fkik
         self.stretch = stretch
         self.stretch_modifiers = stretch_modifiers
         self.pole_lock = pole_lock
         self.pole_vec_obj = pole_vec_obj
         self.bend_setup = bend_setup
-        self.ikfk_suffix_replace = ikfk_suffix_replace
-        self.ik_ctl = ik_ctl
-        self.ik_pv_ctl = ik_pv_ctl
-        self.fk_ctls = fk_ctls
-        self.driver_ctl = driver_ctl
         self.elbow_ctl = elbow_ctl
 
         self.ik_joints = None
@@ -703,24 +736,11 @@ class ThreeBoneLimb(Limb):
         :return: None
         """
 
-        self.aim_axis = [-1, 0, 0] if self.mirror else [1, 0, 0]
+        self.set_aim_axis()
 
-        self.rig_upper_obj = (
-            self.rig_upper_obj if self.rig_upper_obj else self.ctl_parent
-        )
+        self.create_fkik_joints()
 
-        self.fk_joints = pm.duplicate(self.input_joints, parentOnly=True)
-        for i in self.fk_joints:
-            i.rename(i.replace(self.ikfk_suffix_replace, "_fk"))
-        self.fk_joints[0].rename(self.fk_joints[0][:-1])
-        self.ik_joints = pm.duplicate(self.input_joints, parentOnly=True)
-        for i in self.ik_joints:
-            i.rename(i.replace(self.ikfk_suffix_replace, "_ik"))
-        self.ik_joints[0].rename(self.ik_joints[0][:-1])
-        self.skin_joints = pm.duplicate(self.input_joints, parentOnly=True)
-        for i in self.skin_joints:
-            i.rename(i.replace(self.ikfk_suffix_replace, "_skin"))
-        self.skin_joints[0].rename(self.skin_joints[0][:-1])
+        self.set_upper_object()
 
         # Duplicate hierarchy parent joint, constrained to upper control to move with upper control. Used for NoRoll jnt
         self.dup_parent_joint = pm.duplicate(
@@ -762,9 +782,6 @@ class ThreeBoneLimb(Limb):
             print(f"Created noroll joint for {self.limb_name}")
 
         # Parenting to the rig's group
-        pm.parent(self.fk_joints[0], self.rig_setup_grp)
-        pm.parent(self.ik_joints[0], self.rig_setup_grp)
-        pm.parent(self.skin_joints[0], self.rig_setup_grp)
         pm.parent(self.noroll_upper_joint, self.rig_setup_grp)
         pm.parent(self.dup_parent_joint, self.rig_setup_grp)
 
@@ -993,3 +1010,37 @@ class ThreeBoneLimb(Limb):
             pass
 
         return None
+
+
+class DigiLegLimb(Limb):
+    def __init__(
+            self,
+            stretch: bool = True,
+            stretch_modifiers: bool = True,
+            pole_lock: bool = True,
+            pole_vec_obj: pm.nt.Transform = None,
+            bend_setup: bool = True,
+    ):
+        Limb.__init__(self)
+        self.stretch = stretch
+        self.stretch_modifiers = stretch_modifiers
+        self.pole_lock = pole_lock
+        self.pole_vec_obj = pole_vec_obj
+        self.bend_setup = bend_setup
+        self.ik_joints = None
+        self.fk_joints = None
+        self.skin_joints = None
+
+        self.pole_pin_upper_jnt = None
+        self.pole_pin_lower_jnt = None
+
+    def create_digi_bone_limb(self):
+        """
+
+        :return: None
+        """
+        self.set_aim_axis()
+
+        self.create_fkik_joints()
+
+        self.set_upper_object()
