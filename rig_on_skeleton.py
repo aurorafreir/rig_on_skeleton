@@ -1045,3 +1045,18 @@ class DigiLegLimb(Limb):
         self.create_fkik_joints()
 
         self.set_upper_object()
+
+        # FK control constraints
+        pm.parentConstraint(
+            self.fk_ctls[0].ctl, self.fk_joints[0], maintainOffset=False
+        )
+        pm.parentConstraint(
+            self.fk_ctls[1].ctl, self.fk_joints[1], maintainOffset=False
+        )
+        pm.parentConstraint(
+            self.fk_ctls[2].ctl, self.fk_joints[2], maintainOffset=False
+        )
+        pm.parentConstraint(
+            self.fk_ctls[3].ctl, self.fk_joints[3], maintainOffset=False
+        )
+        
