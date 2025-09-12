@@ -347,32 +347,6 @@ def run():
     arm_l.driver_ctl = hand_l_drv_ctl.ctl
     arm_l.create_three_bone_limb()
 
-    # # l arm twist
-    # ros.delete_if_exists("upperarm_twist_01_l_orientConstraint1_drv")
-    # ros.delete_if_exists("upperarm_twist_02_l_orientConstraint1_drv")
-    # ros.delete_if_exists("upperarm_correctiveRoot_l_drv_parentConstraint1")
-    #
-    # upperarm_twist_01_oc = pm.orientConstraint(
-    #     arm_l.noroll_upper_joint,
-    #     arm_l.pole_pin_lower_jnt,
-    #     "upperarm_twist_01_l_drv",
-    #     skip=["y", "z"],
-    #     maintainOffset=True,
-    # )
-    # upperarm_twist_01_oc.interpType.set(2)
-    # upperarm_twist_01_oc.attr(f"{arm_l.noroll_upper_joint}W0").set(0.8)
-    # upperarm_twist_01_oc.attr(f"{arm_l.pole_pin_lower_jnt}W1").set(0.2)
-    # upperarm_twist_02_oc = pm.orientConstraint(
-    #     arm_l.noroll_upper_joint,
-    #     arm_l.pole_pin_lower_jnt,
-    #     "upperarm_twist_02_l_drv",
-    #     skip=["y", "z"],
-    #     maintainOffset=True,
-    # )
-    # upperarm_twist_02_oc.interpType.set(2)
-    # upperarm_twist_02_oc.attr(f"{arm_l.noroll_upper_joint}W0").set(0.4)
-    # upperarm_twist_02_oc.attr(f"{arm_l.pole_pin_lower_jnt}W1").set(0.6)
-
     # add ctls to arm_l.ctl attribute, and append arm_l to rig.limbs
     arm_l.ctls.extend(
         [
@@ -520,32 +494,6 @@ def run():
     arm_r.mirror = True
     arm_r.create_three_bone_limb()
 
-    # # r arm twist
-    # ros.delete_if_exists("upperarm_twist_01_r_orientConstraint1_drv")
-    # ros.delete_if_exists("upperarm_twist_02_r_orientConstraint1_drv")
-    # ros.delete_if_exists("upperarm_correctiveRoot_r_drv_parentConstraint1")
-    #
-    # upperarm_twist_01_oc = pm.orientConstraint(
-    #     arm_r.noroll_upper_joint,
-    #     arm_r.pole_pin_lower_jnt,
-    #     "upperarm_twist_01_r_drv",
-    #     skip=["y", "z"],
-    #     maintainOffset=True,
-    # )
-    # upperarm_twist_01_oc.interpType.set(2)
-    # upperarm_twist_01_oc.attr(f"{arm_r.noroll_upper_joint}W0").set(0.8)
-    # upperarm_twist_01_oc.attr(f"{arm_r.pole_pin_lower_jnt}W1").set(0.2)
-    # upperarm_twist_02_oc = pm.orientConstraint(
-    #     arm_r.noroll_upper_joint,
-    #     arm_r.pole_pin_lower_jnt,
-    #     "upperarm_twist_02_r_drv",
-    #     skip=["y", "z"],
-    #     maintainOffset=True,
-    # )
-    # upperarm_twist_02_oc.interpType.set(2)
-    # upperarm_twist_02_oc.attr(f"{arm_r.noroll_upper_joint}W0").set(0.4)
-    # upperarm_twist_02_oc.attr(f"{arm_r.pole_pin_lower_jnt}W1").set(0.6)
-
     # add ctls to arm_r.ctl attribute, and append arm_r to rig.limbs
     arm_r.ctls.extend(
         [
@@ -586,17 +534,6 @@ def run():
     # SHOULDERS
     pm.parentConstraint(scap_l.ctl, "clavicle_l_drv", maintainOffset=True)
     pm.parentConstraint(scap_r.ctl, "clavicle_r_drv", maintainOffset=True)
-
-    # pm.orientConstraint(arm_l.dup_parent_joint, "upperarm_correctiveRoot_l_drv", maintainOffset=True)
-    # shoulder_l_twist_half_orientconstraint = pm.orientConstraint(arm_l.pole_pin_upper_jnt, arm_l.dup_upperarm_joint,
-    #                                                              "upperarm_correctiveRootCor_l_drv",
-    #                                                              maintainOffset=True)
-    # shoulder_l_twist_half_orientconstraint.interpType.set(2)
-    # pm.orientConstraint(arm_r.dup_parent_joint, "upperarm_correctiveRoot_r_drv", maintainOffset=True)
-    # shoulder_r_twist_half_orientconstraint = pm.orientConstraint(arm_r.pole_pin_upper_jnt, arm_r.dup_upperarm_joint,
-    #                                                              "upperarm_correctiveRootCor_r_drv",
-    #                                                              maintainOffset=True)
-    # shoulder_r_twist_half_orientconstraint.interpType.set(2)
 
     # ARMS
     pm.parentConstraint(arm_l.pole_pin_upper_jnt, "upperarm_l_drv")
