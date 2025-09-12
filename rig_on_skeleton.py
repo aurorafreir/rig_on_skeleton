@@ -834,6 +834,7 @@ class ThreeBoneLimb(Limb):
             dummy_attr=True,
             driver_prefix=self.limb_name,
         )
+        limb_ik_controls_attr.create_attr()
         limb_fkik = Attr(
             main_object=self.driver_ctl,
             attr_name="fkik",
