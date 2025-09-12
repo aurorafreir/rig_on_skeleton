@@ -1059,4 +1059,73 @@ class DigiLegLimb(Limb):
         pm.parentConstraint(
             self.fk_ctls[3].ctl, self.fk_joints[3], maintainOffset=False
         )
-        
+
+        # Attribute creation
+        limb_ik_controls_attr = Attr(
+            main_object=self.driver_ctl,
+            attr_name="ik_controls",
+            nice_name="IK CONTROLS",
+            dummy_attr=True,
+            driver_prefix=self.limb_name,
+        )
+        limb_ik_controls_attr.create_attr()
+        limb_fkik = Attr(
+            main_object=self.driver_ctl,
+            attr_name="fkik",
+            nice_name="FKIK",
+            driver_prefix=self.limb_name,
+            float_min=0,
+            float_max=1,
+        )
+        limb_fkik.create_attr()
+
+        fkik_rev = pm.createNode(
+            "floatMath", name=f"{self.limb_name}_fkik_rev_floatmath"
+        )
+        fkik_rev.operation.set(1)
+        pm.connectAttr(
+            f"{self.driver_object}.{limb_fkik.driver_attr_str}", fkik_rev.floatB
+        )
+
+        # ctl visibility
+        pm.connectAttr(
+            f"{self.driver_object}.{limb_fkik.driver_attr_str}", self.ik_ctl.main_grp.v
+        )
+        pm.connectAttr(
+            f"{self.driver_object}.{limb_fkik.driver_attr_str}",
+            self.ik_pv_ctl.main_grp.v,
+        )
+        pm.connectAttr(fkik_rev.outFloat, self.fk_ctls[0].main_grp.v)
+
+        fkik_quat_setup(
+            name=self.limb_name,
+            input_obj_a=self.ik_joints[0],
+            input_obj_b=self.fk_joints[0],
+            output_obj=self.skin_joints[0],
+            slerp_t_obj=fkik_rev,
+            slerp_t_attr_str="outFloat",
+        )
+        fkik_quat_setup(
+            name=self.limb_name,
+            input_obj_a=self.ik_joints[1],
+            input_obj_b=self.fk_joints[1],
+            output_obj=self.skin_joints[1],
+            slerp_t_obj=fkik_rev,
+            slerp_t_attr_str="outFloat",
+        )
+        fkik_quat_setup(
+            name=self.limb_name,
+            input_obj_a=self.ik_joints[2],
+            input_obj_b=self.fk_joints[2],
+            output_obj=self.skin_joints[2],
+            slerp_t_obj=fkik_rev,
+            slerp_t_attr_str="outFloat",
+        )
+        fkik_quat_setup(
+            name=self.limb_name,
+            input_obj_a=self.ik_joints[3],
+            input_obj_b=self.fk_joints[3],
+            output_obj=self.skin_joints[3],
+            slerp_t_obj=fkik_rev,
+            slerp_t_attr_str="outFloat",
+        )
