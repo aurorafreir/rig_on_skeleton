@@ -632,7 +632,7 @@ def run():
         offset=True,
         spaceswitch=True,
         shape_size=5,
-        parent=knee_l_fk_ctl.ctl,
+        parent=ankle_l_fk_ctl.ctl,
         colour=ros.left_col,
     )
     foot_l_fk_ctl.create_ctl()
