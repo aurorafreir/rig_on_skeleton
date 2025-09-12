@@ -373,14 +373,6 @@ def run():
     upperarm_twist_02_oc.attr(f"{arm_l.noroll_upper_joint}W0").set(0.4)
     upperarm_twist_02_oc.attr(f"{arm_l.pole_pin_lower_jnt}W1").set(0.6)
 
-    # shoulder_l_orient_const = pm.orientConstraint(
-    #     arm_l.dup_parent_joint,
-    #     arm_l.pole_pin_upper_jnt,
-    #     pm.PyNode("upperarm_correctiveRootCor_l_drv"),
-    #     maintainOffset=True,
-    # )
-    # shoulder_l_orient_const.interpType.set(2)
-
     # add ctls to arm_l.ctl attribute, and append arm_l to rig.limbs
     arm_l.ctls.extend(
         [
@@ -553,14 +545,6 @@ def run():
     upperarm_twist_02_oc.interpType.set(2)
     upperarm_twist_02_oc.attr(f"{arm_r.noroll_upper_joint}W0").set(0.4)
     upperarm_twist_02_oc.attr(f"{arm_r.pole_pin_lower_jnt}W1").set(0.6)
-
-    # shoulder_r_orient_const = pm.orientConstraint(
-    #     arm_r.dup_upperarm_joint,
-    #     arm_r.pole_pin_upper_jnt,
-    #     pm.PyNode("upperarm_correctiveRootCor_r_drv"),
-    #     maintainOffset=True,
-    # )
-    # shoulder_r_orient_const.interpType.set(2)
 
     # add ctls to arm_r.ctl attribute, and append arm_r to rig.limbs
     arm_r.ctls.extend(
