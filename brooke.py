@@ -643,16 +643,22 @@ def run():
     )
 
     leg_l.pole_vec_obj = foot_l_pv_ctl.ctl
-    leg_l.ik_ctl = hand_l_ik_ctl
+    leg_l.ik_ctl = foot_l_ik_ctl
     leg_l.ik_pv_ctl = foot_l_pv_ctl
     leg_l.fk_ctls = [thigh_l_fk_ctl, knee_l_fk_ctl, ankle_l_fk_ctl, foot_l_fk_ctl]
     leg_l.driver_ctl = foot_l_drv_ctl.ctl
     leg_l.create_digi_bone_limb()
 
-    # add ctls to arm_l.ctl attribute, and append arm_l to rig.limbs
+    # add ctls to leg_l.ctl attribute, and append leg_l to rig.limbs
     leg_l.ctls.extend(
         [
-
+            foot_l_drv_ctl,
+            foot_l_ik_ctl,
+            foot_l_pv_ctl,
+            thigh_l_fk_ctl,
+            knee_l_fk_ctl,
+            ankle_l_fk_ctl,
+            foot_l_fk_ctl,
         ]
     )
     rig.limbs.append(leg_l)
