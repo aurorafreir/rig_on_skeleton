@@ -3,7 +3,7 @@ Trans Rights are Human Rights :3c
 
 This is an example of a rig created for a Digitigrade Anthrophormorphic character (human body with dog legs + tail)
 """
-
+from fnmatch import translate
 # SYSTEM IMPORTS
 from importlib import reload
 import time
@@ -535,7 +535,7 @@ def run():
         offset=True,
         spaceswitch=True,
         shape_size=2,
-        transform_shape=[5, 0, 5],
+        transform_shape=[5, 0, 7],
         parent=leg_l.rig_ctls_grp,
         colour=ros.driver_col,
     )
@@ -551,7 +551,7 @@ def run():
         ctl_shape="box",
         offset=True,
         spaceswitch=True,
-        shape_size=7,
+        shape_size=13,
         parent=leg_l.rig_ctls_grp,
         colour=ros.left_col,
     )
@@ -566,8 +566,8 @@ def run():
         ctl_shape="box",
         offset=True,
         spaceswitch=True,
-        shape_size=5,
-        transform_shape=[-5, 0, 5],
+        shape_size=[3, 10, 10],
+        transform_shape=[-7, 0, 5],
         parent=foot_l_ik_ctl.ctl,
         colour=ros.left_col,
     )
@@ -576,6 +576,7 @@ def run():
         foot_l_ankle_reverse_ctl.main_grp,
         matrix=pm.xform("foot_l_drv", matrix=True, query=True, worldSpace=True),
         worldSpace=True, )
+    pm.xform(foot_l_ankle_reverse_ctl.main_grp, rotation=(0, -30, 0))
     # pv
     foot_l_pv_ctl = ros.CtrlSet(
         ctl_name="foot_l_pv",
@@ -599,7 +600,8 @@ def run():
         ctl_shape="box",
         offset=True,
         spaceswitch=True,
-        shape_size=7,
+        shape_size=[30, 15, 15],
+        transform_shape=[15, 0, 0],
         parent=leg_l.rig_ctls_grp,
         colour=ros.left_col,
     )
@@ -615,7 +617,8 @@ def run():
         ctl_shape="box",
         offset=True,
         spaceswitch=True,
-        shape_size=7,
+        shape_size=[25, 11, 11],
+        transform_shape=[13, 0, 0],
         parent=thigh_l_fk_ctl.ctl,
         colour=ros.left_col,
     )
@@ -631,7 +634,8 @@ def run():
         ctl_shape="box",
         offset=True,
         spaceswitch=True,
-        shape_size=5,
+        shape_size=[16, 11, 11],
+        transform_shape=[5, 0, 0],
         parent=knee_l_fk_ctl.ctl,
         colour=ros.left_col,
     )
@@ -647,7 +651,7 @@ def run():
         ctl_shape="box",
         offset=True,
         spaceswitch=True,
-        shape_size=5,
+        shape_size=11,
         parent=ankle_l_fk_ctl.ctl,
         colour=ros.left_col,
     )
