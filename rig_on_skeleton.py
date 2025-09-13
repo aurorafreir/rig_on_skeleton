@@ -700,7 +700,6 @@ class Limb:
         )
 
 
-
 class ThreeBoneLimb(Limb):
     def __init__(
             self,
@@ -1021,6 +1020,7 @@ class DigiLegLimb(Limb):
             pole_lock: bool = True,
             pole_vec_obj: pm.nt.Transform = None,
             bend_setup: bool = True,
+            foot_reverse_angle_ctl: pm.nt.Transform = None,
     ):
         Limb.__init__(self)
         self.stretch = stretch
@@ -1028,9 +1028,7 @@ class DigiLegLimb(Limb):
         self.pole_lock = pole_lock
         self.pole_vec_obj = pole_vec_obj
         self.bend_setup = bend_setup
-        self.ik_joints = None
-        self.fk_joints = None
-        self.skin_joints = None
+        self.foot_reverse_angle_ctl = foot_reverse_angle_ctl
 
         self.pole_pin_upper_jnt = None
         self.pole_pin_lower_jnt = None
@@ -1059,6 +1057,44 @@ class DigiLegLimb(Limb):
         pm.parentConstraint(
             self.fk_ctls[3].ctl, self.fk_joints[3], maintainOffset=False
         )
+
+        # TODO AFOX CLEAN ALL OF THIS BACKWARDS IK CODE
+        # Backwards IK setup
+        self.ik_driver_top_joint = pm.duplicate(self.input_joints[0], parentOnly=True)
+        self.ik_driver_middle_joint = pm.duplicate(self.input_joints[2], parentOnly=True)
+        self.ik_driver_bottom_joint = pm.duplicate(self.input_joints[3], parentOnly=True)
+        self.ik_driver_bottom_reverse_joint = pm.duplicate(self.input_joints[3], parentOnly=True)
+        self.ik_driver_ankle_reverse_joint = pm.duplicate(self.input_joints[2], parentOnly=True)
+        self.ik_driver_middle_t = pm.xform(self.input_joints[2], t=True, q=True, ws=True)
+        self.ik_driver_middle_joint_ty = (pm.xform(self.skin_joints[0], t=True, q=True, ws=True)[1] +
+                                     pm.xform(self.skin_joints[3], t=True, q=True, ws=True)[1]) / 2
+
+        pm.xform(self.ik_driver_middle_joint,
+                 t=[self.ik_driver_middle_t[0], self.ik_driver_middle_joint_ty, self.ik_driver_middle_t[2]],
+                 ws=True)
+
+        pm.parent(self.ik_driver_top_joint, self.rig_setup_grp)
+        pm.parent(self.ik_driver_middle_joint, self.ik_driver_top_joint)
+        pm.parent(self.ik_driver_bottom_joint, self.ik_driver_middle_joint)
+        pm.parent(self.ik_driver_bottom_reverse_joint, self.ik_driver_bottom_joint)
+        pm.parent(self.ik_driver_ankle_reverse_joint, self.ik_driver_bottom_reverse_joint)
+
+        self.inverse_ikh = pm.ikHandle(name=f"{self.limb_name}_inverse_drv_ikh", startJoint=self.ik_driver_top_joint[0], endEffector=self.ik_driver_bottom_joint[0])
+        self.upper_ikh = pm.ikHandle(name=f"{self.limb_name}_upper_drv_ikh", startJoint=self.ik_joints[0], endEffector=self.ik_joints[2])
+        self.lower_ikh = pm.ikHandle(name=f"{self.limb_name}_lower_drv_ikh", startJoint=self.ik_joints[2], endEffector=self.ik_joints[3], solver="ikSCsolver")
+        pm.parent(self.inverse_ikh[0], self.rig_setup_grp)
+        pm.parent(self.upper_ikh[0], self.rig_setup_grp)
+        pm.parent(self.lower_ikh[0], self.rig_setup_grp)
+        pm.parentConstraint(self.ik_ctl.ctl, self.inverse_ikh[0], maintainOffset=True)
+        pm.parentConstraint(self.ik_driver_ankle_reverse_joint, self.upper_ikh[0], maintainOffset=True)
+        pm.parentConstraint(self.ik_driver_bottom_joint, self.lower_ikh[0], maintainOffset=True)
+        pm.poleVectorConstraint(self.pole_vec_obj, self.inverse_ikh[0])
+        self.inverse_ikh[0].twist.set(180)
+        pm.poleVectorConstraint(self.pole_vec_obj, self.upper_ikh[0])
+        pm.orientConstraint(self.foot_reverse_angle_ctl.ctl, self.ik_driver_bottom_reverse_joint, maintainOffset=True)
+        pm.parentConstraint(self.rig_upper_obj, self.ik_joints[0], maintainOffset=True, skipRotate=["x", "y", "z"])
+        pm.parentConstraint(self.rig_upper_obj, self.skin_joints[0], maintainOffset=True, skipRotate=["x", "y", "z"])
+        pm.parentConstraint(self.rig_upper_obj, self.ik_driver_top_joint, maintainOffset=True, skipRotate=["x", "y", "z"])
 
         # Attribute creation
         limb_ik_controls_attr = Attr(

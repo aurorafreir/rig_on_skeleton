@@ -82,6 +82,7 @@ def run():
     hip_limb.limb_name = "hip"
     hip_limb.rig_parent = rig.rig_setup_grp
     hip_limb.ctl_parent = rig.ctls_grp
+    hip_limb.input_joints = ["pelvis_drv"]
 
     hip_ctl = ros.CtrlSet(
         ctl_name="hip",
@@ -560,6 +561,21 @@ def run():
         matrix=pm.xform("foot_l_drv", matrix=True, query=True, worldSpace=True),
         worldSpace=True,
     )
+    foot_l_ankle_reverse_ctl = ros.CtrlSet(
+        ctl_name="foot_l_ankle_reverse",
+        ctl_shape="box",
+        offset=True,
+        spaceswitch=True,
+        shape_size=5,
+        transform_shape=[-5, 0, 5],
+        parent=foot_l_ik_ctl.ctl,
+        colour=ros.left_col,
+    )
+    foot_l_ankle_reverse_ctl.create_ctl()
+    pm.xform(
+        foot_l_ankle_reverse_ctl.main_grp,
+        matrix=pm.xform("foot_l_drv", matrix=True, query=True, worldSpace=True),
+        worldSpace=True, )
     # pv
     foot_l_pv_ctl = ros.CtrlSet(
         ctl_name="foot_l_pv",
@@ -645,6 +661,7 @@ def run():
     leg_l.pole_vec_obj = foot_l_pv_ctl.ctl
     leg_l.ik_ctl = foot_l_ik_ctl
     leg_l.ik_pv_ctl = foot_l_pv_ctl
+    leg_l.foot_reverse_angle_ctl = foot_l_ankle_reverse_ctl
     leg_l.fk_ctls = [thigh_l_fk_ctl, knee_l_fk_ctl, ankle_l_fk_ctl, foot_l_fk_ctl]
     leg_l.driver_ctl = foot_l_drv_ctl.ctl
     leg_l.create_digi_bone_limb()
@@ -682,7 +699,9 @@ def run():
     pm.parentConstraint(arm_r.skin_joints[2], hand_r_drv_ctl.main_grp)
 
     # LEGS
+    pm.parentConstraint(hip_ctl.ctl, leg_l.fk_ctls[0].main_grp, maintainOffset=True)
     pm.parentConstraint(leg_l.skin_joints[3], foot_l_drv_ctl.main_grp, maintainOffset=True)
+    pm.orientConstraint(leg_l.ik_driver_bottom_joint, foot_l_ankle_reverse_ctl.main_grp, maintainOffset=True)
 
     # -- CONTROLLER TO SKELETON CONSTRAINTS --
     # HIPS
@@ -703,6 +722,13 @@ def run():
     pm.parentConstraint(arm_r.pole_pin_upper_jnt, "upperarm_r_drv")
     pm.parentConstraint(arm_r.pole_pin_lower_jnt, "lowerarm_r_drv")
     pm.parentConstraint(arm_r.skin_joints[2], "hand_r_drv")
+
+    # LEGS
+    pm.parentConstraint(leg_l.skin_joints[0], "thigh_l_drv")
+    pm.parentConstraint(leg_l.skin_joints[1], "knee_l_drv")
+    pm.parentConstraint(leg_l.skin_joints[2], "ankle_l_drv")
+    pm.parentConstraint(leg_l.skin_joints[3], "foot_l_drv")
+    pm.parentConstraint(foot_l_ik_ctl.ctl, foot_l_pv_ctl.main_grp, maintainOffset=True)  # TEMP UNTIL SPACE SWITCH WORKS
 
     # -- ATTRIBUTE FINALISING/LOCKING/HIDING --
     # HIPS
@@ -749,7 +775,9 @@ def run():
         ros.lock_hide_default_attrs(control, rotate=False, translate=False)
     for control in [foot_l_drv_ctl.ctl]:  # HAND DRIVER
         ros.lock_hide_default_attrs(control)
-
+    for control in [foot_l_ankle_reverse_ctl.ctl]: # FOOT REVERSE ANKLE CONTROL
+        ros.lock_hide_default_attrs(control, rotate=False)
+    foot_l_drv_ctl.ctl.fkik.set(1)
 
     # RIG
     # rig.rig_setup_grp.visibility.set(0)
