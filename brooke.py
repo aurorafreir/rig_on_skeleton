@@ -249,7 +249,7 @@ def run():
         offset=True,
         spaceswitch=True,
         shape_size=2,
-        transform_shape=[5, -5, 0],
+        transform_shape=[5, 0, 5],
         parent=arm_l.rig_ctls_grp,
         colour=ros.driver_col,
     )
@@ -298,7 +298,8 @@ def run():
         ctl_shape="box",
         offset=True,
         spaceswitch=True,
-        shape_size=7,
+        shape_size=[20, 9, 9],
+        transform_shape=[10, 0, 0],
         parent=arm_l.rig_ctls_grp,
         colour=ros.left_col,
     )
@@ -314,7 +315,8 @@ def run():
         ctl_shape="box",
         offset=True,
         spaceswitch=True,
-        shape_size=7,
+        shape_size=[20, 8, 8],
+        transform_shape=[8, 0, 0],
         parent=upperarm_l_fk_ctl.ctl,
         colour=ros.left_col,
     )
@@ -389,7 +391,7 @@ def run():
         offset=True,
         spaceswitch=True,
         shape_size=2,
-        transform_shape=[-5, 5, 0],
+        transform_shape=[-5, 0, -5],
         parent=arm_r.rig_ctls_grp,
         colour=ros.driver_col,
     )
@@ -439,7 +441,8 @@ def run():
         ctl_shape="box",
         offset=True,
         spaceswitch=True,
-        shape_size=7,
+        shape_size=[20, 9, 9],
+        transform_shape=[10, 0, 0],
         parent=arm_r.rig_ctls_grp,
         colour=ros.right_col,
         mirror=True,
@@ -456,7 +459,8 @@ def run():
         ctl_shape="box",
         offset=True,
         spaceswitch=True,
-        shape_size=7,
+        shape_size=[20, 8, 8],
+        transform_shape=[8, 0, 0],
         parent=upperarm_r_fk_ctl.ctl,
         colour=ros.right_col,
     )
