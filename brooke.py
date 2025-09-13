@@ -701,7 +701,7 @@ def run():
     # LEGS
     pm.parentConstraint(hip_ctl.ctl, leg_l.fk_ctls[0].main_grp, maintainOffset=True)
     pm.parentConstraint(leg_l.skin_joints[3], foot_l_drv_ctl.main_grp, maintainOffset=True)
-    pm.orientConstraint(leg_l.ik_driver_bottom_joint, foot_l_ankle_reverse_ctl.main_grp, maintainOffset=True)
+    pm.orientConstraint(leg_l.ik_driver_bottom_rotate_joint, foot_l_ankle_reverse_ctl.main_grp, maintainOffset=True)
 
     # -- CONTROLLER TO SKELETON CONSTRAINTS --
     # HIPS

@@ -1063,6 +1063,7 @@ class DigiLegLimb(Limb):
         self.ik_driver_top_joint = pm.duplicate(self.input_joints[0], parentOnly=True)
         self.ik_driver_middle_joint = pm.duplicate(self.input_joints[2], parentOnly=True)
         self.ik_driver_bottom_joint = pm.duplicate(self.input_joints[3], parentOnly=True)
+        self.ik_driver_bottom_rotate_joint = pm.duplicate(self.input_joints[3], parentOnly=True)
         self.ik_driver_bottom_reverse_joint = pm.duplicate(self.input_joints[3], parentOnly=True)
         self.ik_driver_ankle_reverse_joint = pm.duplicate(self.input_joints[2], parentOnly=True)
         self.ik_driver_middle_t = pm.xform(self.input_joints[2], t=True, q=True, ws=True)
@@ -1076,7 +1077,8 @@ class DigiLegLimb(Limb):
         pm.parent(self.ik_driver_top_joint, self.rig_setup_grp)
         pm.parent(self.ik_driver_middle_joint, self.ik_driver_top_joint)
         pm.parent(self.ik_driver_bottom_joint, self.ik_driver_middle_joint)
-        pm.parent(self.ik_driver_bottom_reverse_joint, self.ik_driver_bottom_joint)
+        pm.parent(self.ik_driver_bottom_rotate_joint, self.ik_driver_bottom_joint)
+        pm.parent(self.ik_driver_bottom_reverse_joint, self.ik_driver_bottom_rotate_joint)
         pm.parent(self.ik_driver_ankle_reverse_joint, self.ik_driver_bottom_reverse_joint)
 
         self.inverse_ikh = pm.ikHandle(name=f"{self.limb_name}_inverse_drv_ikh", startJoint=self.ik_driver_top_joint[0], endEffector=self.ik_driver_bottom_joint[0])
@@ -1087,14 +1089,18 @@ class DigiLegLimb(Limb):
         pm.parent(self.lower_ikh[0], self.rig_setup_grp)
         pm.parentConstraint(self.ik_ctl.ctl, self.inverse_ikh[0], maintainOffset=True)
         pm.parentConstraint(self.ik_driver_ankle_reverse_joint, self.upper_ikh[0], maintainOffset=True)
-        pm.parentConstraint(self.ik_driver_bottom_joint, self.lower_ikh[0], maintainOffset=True)
+        pm.parentConstraint(self.ik_driver_bottom_reverse_joint, self.lower_ikh[0], maintainOffset=True)
         pm.poleVectorConstraint(self.pole_vec_obj, self.inverse_ikh[0])
         self.inverse_ikh[0].twist.set(180)
         pm.poleVectorConstraint(self.pole_vec_obj, self.upper_ikh[0])
         pm.orientConstraint(self.foot_reverse_angle_ctl.ctl, self.ik_driver_bottom_reverse_joint, maintainOffset=True)
+        pm.orientConstraint(self.ik_driver_bottom_joint, self.foot_reverse_angle_ctl.main_grp, maintainOffset=True)
         pm.parentConstraint(self.rig_upper_obj, self.ik_joints[0], maintainOffset=True, skipRotate=["x", "y", "z"])
         pm.parentConstraint(self.rig_upper_obj, self.skin_joints[0], maintainOffset=True, skipRotate=["x", "y", "z"])
         pm.parentConstraint(self.rig_upper_obj, self.ik_driver_top_joint, maintainOffset=True, skipRotate=["x", "y", "z"])
+
+        pm.orientConstraint(self.ik_ctl.ctl, self.ik_driver_bottom_rotate_joint, maintainOffset=True)
+        pm.orientConstraint(self.ik_ctl.ctl, self.ik_joints[3], maintainOffset=True)
 
         # Attribute creation
         limb_ik_controls_attr = Attr(
