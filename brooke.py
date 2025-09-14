@@ -38,7 +38,8 @@ def run():
     pm.refresh()
 
     # -- CONTROLLER SETUP --
-    # ROOT CONTROLS #
+    generic_controller_group_flags = {"offset": True, "spaceswitch": True}
+    # -- ROOT CONTROLS --
     root_limb = ros.Limb()
     root_limb.limb_name = "root"
     root_limb.rig_parent = rig.rig_setup_grp
@@ -64,10 +65,9 @@ def run():
     root_ctl = ros.CtrlSet(
         ctl_name="root",
         ctl_shape="box",
-        offset=True,
-        spaceswitch=True,
         shape_size=2,
         parent=rig.ctls_grp,
+        **generic_controller_group_flags
     )
     root_ctl.create_ctl()
 
@@ -77,7 +77,7 @@ def run():
 
     pm.refresh()
 
-    # HIP CONTROLS #
+    # -- HIP CONTROLS --
     hip_limb = ros.Limb()
     hip_limb.limb_name = "hip"
     hip_limb.rig_parent = rig.rig_setup_grp
@@ -87,10 +87,9 @@ def run():
     hip_ctl = ros.CtrlSet(
         ctl_name="hip",
         ctl_shape="box",
-        offset=True,
-        spaceswitch=True,
         shape_size=[40, 10, 30],
         parent=global_off_ctl.ctl,
+        **generic_controller_group_flags
     )
     hip_ctl.create_ctl()
     pm.xform(
@@ -107,7 +106,7 @@ def run():
 
     pm.refresh()
 
-    # NECK AND HEAD
+    # -- NECK AND HEAD --
     neck_and_head_limb = ros.Limb()
     neck_and_head_limb.limb_name = "neck_and_head"
     neck_and_head_limb.rig_parent = rig.rig_setup_grp
@@ -115,12 +114,11 @@ def run():
     neck_01 = ros.CtrlSet(
         ctl_name="neck_01",
         ctl_shape="box",
-        offset=True,
-        spaceswitch=True,
         shape_size=[3, 12, 12],
         transform_shape=[3, 0, 0],
         parent=rig.ctls_grp,
         colour=ros.centre_col,
+        **generic_controller_group_flags
     )
     neck_01.create_ctl()
     pm.xform(
@@ -131,11 +129,10 @@ def run():
     neck_02 = ros.CtrlSet(
         ctl_name="neck_01",
         ctl_shape="box",
-        offset=True,
-        spaceswitch=True,
         shape_size=[3, 12, 12],
         parent=neck_01.ctl,
         colour=ros.centre_col,
+        **generic_controller_group_flags
     )
     neck_02.create_ctl()
     pm.xform(
@@ -147,12 +144,11 @@ def run():
     head = ros.CtrlSet(
         ctl_name="head",
         ctl_shape="box",
-        offset=True,
-        spaceswitch=True,
         shape_size=[15, 20, 15],
         transform_shape=[3, -2, 0],
         parent=neck_02.ctl,
         colour=ros.centre_col,
+        **generic_controller_group_flags
     )
     head.create_ctl()
     pm.xform(
@@ -167,7 +163,7 @@ def run():
 
     pm.refresh()
 
-    # SHOULDERS
+    # -- SHOULDERS --
     shoulder_l = ros.Limb()
     shoulder_l.limb_name = "shoulder_l"
     shoulder_l.rig_parent = rig.rig_setup_grp
@@ -175,13 +171,12 @@ def run():
     scap_l = ros.CtrlSet(
         ctl_name="shoulder_l",
         ctl_shape="box",
-        offset=True,
-        spaceswitch=True,
         shape_size=[15, 10, 20],
         transform_shape=[10, 2, 0],
         parent=rig.ctls_grp,
         colour=ros.left_col,
         mirror=True,
+        **generic_controller_group_flags
     )  # mirror is unused, but makes for a cleaner end result
     scap_l.create_ctl()
     pm.xform(
@@ -202,13 +197,12 @@ def run():
     scap_r = ros.CtrlSet(
         ctl_name="shoulder_r",
         ctl_shape="box",
-        offset=True,
-        spaceswitch=True,
         shape_size=[15, 10, 20],
         transform_shape=[10, 2, 0],
         parent=rig.ctls_grp,
         colour=ros.right_col,
         mirror=True,
+        **generic_controller_group_flags
     )
     scap_r.create_ctl()
     pm.xform(
@@ -223,6 +217,7 @@ def run():
 
     pm.refresh()
 
+    # -- ARMS --
     # L HAND SETUP
     arm_pv_l_main_grp, _, arm_pv_l_placer = ros.place_temp_pv_locators(
         name="l_arm",
@@ -246,12 +241,11 @@ def run():
     hand_l_drv_ctl = ros.CtrlSet(
         ctl_name="hand_l_driver",
         ctl_shape="star",
-        offset=True,
-        spaceswitch=True,
         shape_size=2,
         transform_shape=[5, 0, 5],
         parent=arm_l.rig_ctls_grp,
         colour=ros.driver_col,
+        **generic_controller_group_flags
     )
     hand_l_drv_ctl.create_ctl()
     pm.xform(
@@ -263,11 +257,10 @@ def run():
     hand_l_ik_ctl = ros.CtrlSet(
         ctl_name="hand_l_ik",
         ctl_shape="box",
-        offset=True,
-        spaceswitch=True,
         shape_size=7,
         parent=arm_l.rig_ctls_grp,
         colour=ros.left_col,
+        **generic_controller_group_flags
     )
     hand_l_ik_ctl.create_ctl()
     pm.xform(
@@ -279,12 +272,11 @@ def run():
     hand_l_pv_ctl = ros.CtrlSet(
         ctl_name="hand_l_pv",
         ctl_shape="star",
-        offset=True,
-        spaceswitch=True,
         shape_size=3,
         parent=arm_l.rig_ctls_grp,
         colour=ros.left_col,
         mirror=True,
+        **generic_controller_group_flags
     )
     hand_l_pv_ctl.create_ctl()
     pm.xform(
@@ -296,12 +288,11 @@ def run():
     upperarm_l_fk_ctl = ros.CtrlSet(
         ctl_name="upperarm_l_fk",
         ctl_shape="box",
-        offset=True,
-        spaceswitch=True,
         shape_size=[20, 9, 9],
         transform_shape=[10, 0, 0],
         parent=arm_l.rig_ctls_grp,
         colour=ros.left_col,
+        **generic_controller_group_flags
     )
     upperarm_l_fk_ctl.create_ctl()
     pm.xform(
@@ -313,12 +304,11 @@ def run():
     lowerarm_l_fk_ctl = ros.CtrlSet(
         ctl_name="lowerarm_l_fk",
         ctl_shape="box",
-        offset=True,
-        spaceswitch=True,
         shape_size=[20, 8, 8],
         transform_shape=[8, 0, 0],
         parent=upperarm_l_fk_ctl.ctl,
         colour=ros.left_col,
+        **generic_controller_group_flags
     )
     lowerarm_l_fk_ctl.create_ctl()
     pm.xform(
@@ -330,11 +320,10 @@ def run():
     hand_l_fk_ctl = ros.CtrlSet(
         ctl_name="hand_l_fk",
         ctl_shape="box",
-        offset=True,
-        spaceswitch=True,
         shape_size=5,
         parent=lowerarm_l_fk_ctl.ctl,
         colour=ros.left_col,
+        **generic_controller_group_flags
     )
     hand_l_fk_ctl.create_ctl()
     pm.xform(
@@ -388,12 +377,11 @@ def run():
     hand_r_drv_ctl = ros.CtrlSet(
         ctl_name="hand_r_driver",
         ctl_shape="star",
-        offset=True,
-        spaceswitch=True,
         shape_size=2,
         transform_shape=[-5, 0, -5],
         parent=arm_r.rig_ctls_grp,
         colour=ros.driver_col,
+        **generic_controller_group_flags
     )
     hand_r_drv_ctl.create_ctl()
     pm.xform(
@@ -405,12 +393,11 @@ def run():
     hand_r_ik_ctl = ros.CtrlSet(
         ctl_name="hand_r_ik",
         ctl_shape="box",
-        offset=True,
-        spaceswitch=True,
         shape_size=7,
         parent=arm_r.rig_ctls_grp,
         colour=ros.right_col,
         mirror=True,
+        **generic_controller_group_flags
     )
     hand_r_ik_ctl.create_ctl()
     pm.xform(
@@ -422,12 +409,11 @@ def run():
     hand_r_pv_ctl = ros.CtrlSet(
         ctl_name="hand_r_pv",
         ctl_shape="star",
-        offset=True,
-        spaceswitch=True,
         shape_size=3,
         parent=arm_r.rig_ctls_grp,
         colour=ros.right_col,
         mirror=True,
+        **generic_controller_group_flags
     )
     hand_r_pv_ctl.create_ctl()
     pm.xform(
@@ -439,13 +425,12 @@ def run():
     upperarm_r_fk_ctl = ros.CtrlSet(
         ctl_name="upperarm_r_fk",
         ctl_shape="box",
-        offset=True,
-        spaceswitch=True,
         shape_size=[20, 9, 9],
         transform_shape=[10, 0, 0],
         parent=arm_r.rig_ctls_grp,
         colour=ros.right_col,
         mirror=True,
+        **generic_controller_group_flags
     )
     upperarm_r_fk_ctl.create_ctl()
     pm.xform(
@@ -457,12 +442,11 @@ def run():
     lowerarm_r_fk_ctl = ros.CtrlSet(
         ctl_name="lowerarm_r_fk",
         ctl_shape="box",
-        offset=True,
-        spaceswitch=True,
         shape_size=[20, 8, 8],
         transform_shape=[8, 0, 0],
         parent=upperarm_r_fk_ctl.ctl,
         colour=ros.right_col,
+        **generic_controller_group_flags
     )
     lowerarm_r_fk_ctl.create_ctl()
     pm.xform(
@@ -474,11 +458,10 @@ def run():
     hand_r_fk_ctl = ros.CtrlSet(
         ctl_name="hand_r_fk",
         ctl_shape="box",
-        offset=True,
-        spaceswitch=True,
         shape_size=5,
         parent=lowerarm_r_fk_ctl.ctl,
         colour=ros.right_col,
+        **generic_controller_group_flags
     )
     hand_r_fk_ctl.create_ctl()
     pm.xform(
@@ -512,6 +495,12 @@ def run():
     )
     rig.limbs.append(arm_r)
 
+    # -- LEGS --
+    foot_ankle_reverse_flags = {"shape_size": [3, 10, 10], "transform_shape": [-7, 0, 5]}
+    thigh_fk_flags = {"shape_size": [30, 15, 15], "transform_shape": [15, 0, 0]}
+    knee_fk_flags = {"shape_size": [25, 11, 11], "transform_shape": [13, 0, 0]}
+    ankle_fk_flags = {"shape_size": [16, 11, 11], "transform_shape": [5, 0, 0]}
+
     # L LEG SETUP
     leg_pv_l_main_grp, _, leg_pv_l_placer = ros.place_temp_pv_locators(
         name="l_leg",
@@ -536,12 +525,11 @@ def run():
     foot_l_drv_ctl = ros.CtrlSet(
         ctl_name="foot_l_driver",
         ctl_shape="star",
-        offset=True,
-        spaceswitch=True,
         shape_size=2,
         transform_shape=[5, 0, 7],
         parent=leg_l.rig_ctls_grp,
         colour=ros.driver_col,
+        **generic_controller_group_flags,
     )
     foot_l_drv_ctl.create_ctl()
     pm.xform(
@@ -553,11 +541,10 @@ def run():
     foot_l_ik_ctl = ros.CtrlSet(
         ctl_name="foot_l_ik",
         ctl_shape="box",
-        offset=True,
-        spaceswitch=True,
         shape_size=13,
         parent=leg_l.rig_ctls_grp,
         colour=ros.left_col,
+        **generic_controller_group_flags,
     )
     foot_l_ik_ctl.create_ctl()
     pm.xform(
@@ -568,12 +555,10 @@ def run():
     foot_l_ankle_reverse_ctl = ros.CtrlSet(
         ctl_name="foot_l_ankle_reverse",
         ctl_shape="box",
-        offset=True,
-        spaceswitch=True,
-        shape_size=[3, 10, 10],
-        transform_shape=[-7, 0, 5],
         parent=foot_l_ik_ctl.ctl,
         colour=ros.left_col,
+        **foot_ankle_reverse_flags,
+        **generic_controller_group_flags,
     )
     foot_l_ankle_reverse_ctl.create_ctl()
     pm.xform(
@@ -585,12 +570,11 @@ def run():
     foot_l_pv_ctl = ros.CtrlSet(
         ctl_name="foot_l_pv",
         ctl_shape="star",
-        offset=True,
-        spaceswitch=True,
         shape_size=3,
         parent=leg_l.rig_ctls_grp,
         colour=ros.left_col,
         mirror=True,
+        **generic_controller_group_flags,
     )
     foot_l_pv_ctl.create_ctl()
     pm.xform(
@@ -602,12 +586,10 @@ def run():
     thigh_l_fk_ctl = ros.CtrlSet(
         ctl_name="thigh_l_fk",
         ctl_shape="box",
-        offset=True,
-        spaceswitch=True,
-        shape_size=[30, 15, 15],
-        transform_shape=[15, 0, 0],
         parent=leg_l.rig_ctls_grp,
         colour=ros.left_col,
+        **thigh_fk_flags,
+        **generic_controller_group_flags,
     )
     thigh_l_fk_ctl.create_ctl()
     pm.xform(
@@ -619,12 +601,10 @@ def run():
     knee_l_fk_ctl = ros.CtrlSet(
         ctl_name="knee_l_fk",
         ctl_shape="box",
-        offset=True,
-        spaceswitch=True,
-        shape_size=[25, 11, 11],
-        transform_shape=[13, 0, 0],
         parent=thigh_l_fk_ctl.ctl,
         colour=ros.left_col,
+        **knee_fk_flags,
+        **generic_controller_group_flags,
     )
     knee_l_fk_ctl.create_ctl()
     pm.xform(
@@ -636,12 +616,10 @@ def run():
     ankle_l_fk_ctl = ros.CtrlSet(
         ctl_name="ankle_l_fk",
         ctl_shape="box",
-        offset=True,
-        spaceswitch=True,
-        shape_size=[16, 11, 11],
-        transform_shape=[5, 0, 0],
         parent=knee_l_fk_ctl.ctl,
         colour=ros.left_col,
+        **ankle_fk_flags,
+        **generic_controller_group_flags,
     )
     ankle_l_fk_ctl.create_ctl()
     pm.xform(
@@ -653,11 +631,10 @@ def run():
     foot_l_fk_ctl = ros.CtrlSet(
         ctl_name="foot_l_fk",
         ctl_shape="box",
-        offset=True,
-        spaceswitch=True,
         shape_size=11,
         parent=ankle_l_fk_ctl.ctl,
         colour=ros.left_col,
+        **generic_controller_group_flags,
     )
     foot_l_fk_ctl.create_ctl()
     pm.xform(
