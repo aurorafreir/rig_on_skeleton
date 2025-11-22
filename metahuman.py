@@ -751,6 +751,10 @@ def run():
     pm.parentConstraint(arm_l.skin_joints[2], hand_l_drv_ctl.main_grp)
     pm.parentConstraint(arm_r.skin_joints[2], hand_r_drv_ctl.main_grp)
 
+    # LEGS
+    pm.parentConstraint(hip_ctl.ctl, rig.limbs[7].fk_ctls[0].main_grp, maintainOffset=True)
+    pm.parentConstraint(hip_ctl.ctl, rig.limbs[8].fk_ctls[0].main_grp, maintainOffset=True)
+
     # -- CONTROLLER TO SKELETON CONSTRAINTS --
     # HIPS
     pm.parentConstraint(root_ctl.ctl, "root_drv", maintainOffset=True)
