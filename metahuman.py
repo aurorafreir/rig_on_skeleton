@@ -559,6 +559,182 @@ def run():
     )
     rig.limbs.append(arm_r)
 
+    # LEGS
+    foot_ankle_reverse_flags = {"shape_size": [3, 10, 10], "transform_shape": [-7, 0, 5]}
+    thigh_fk_flags = {"shape_size": [30, 15, 15], "transform_shape": [-15, 0, 0]}
+    knee_fk_flags = {"shape_size": [25, 11, 11], "transform_shape": [-13, 0, 0]}
+    # ankle_fk_flags = {"shape_size": [16, 11, 11], "transform_shape": [5, 0, 0]}
+
+    # LEG SETUP  (L and R are mirrored position-wise, so we can use the Left side's transforms and flip them post build
+
+    for side in ["l", "r"]:
+        side_mirror = True if side == "r" else False
+        side_colour = ros.right_col if side == "r" else ros.left_col
+
+        leg_pv_main_grp, _, leg_pv_placer = ros.place_temp_pv_locators(
+            name=f"{side}_leg",
+            upper_joint=pm.PyNode(f"thigh_l_drv"),
+            middle_joint=pm.PyNode(f"calf_l_drv"),
+            lower_joint=pm.PyNode(f"foot_l_drv"),
+            pv_x_multiplier=.7
+        )
+        pm.parent(leg_pv_main_grp, rig.temp_rig_grp)
+        leg_side = ros.ThreeBoneLimb()
+
+        leg_side.limb_name = f"leg_{side}"
+        leg_side.input_joints = [f"thigh_{side}_drv", f"calf_{side}_drv", f"foot_{side}_drv"]
+        leg_side.ikfk_suffix_replace = "_drv"
+        leg_side.driver_object = driver
+        leg_side.rig_parent = rig.rig_setup_grp
+        leg_side.ctl_parent = rig.ctls_grp
+        leg_side.rig_upper_obj = hip_ctl.ctl
+        leg_side.verbose = print_errors
+        leg_side.create_limb_setup()
+        # CONTROLS #
+        # driver
+        foot_drv_ctl = ros.CtrlSet(
+            ctl_name=f"foot_{side}_driver",
+            ctl_shape="star",
+            shape_size=2,
+            transform_shape=[5, -7, 0],
+            parent=leg_side.rig_ctls_grp,
+            colour=ros.driver_col,
+            **generic_controller_group_flags,
+            mirror=True
+        )
+        foot_drv_ctl.create_ctl()
+        pm.xform(
+            foot_drv_ctl.main_grp,
+            matrix=pm.xform("foot_l_drv", matrix=True, query=True, worldSpace=True),
+            worldSpace=True,
+        )
+        # ik
+        foot_ik_ctl = ros.CtrlSet(
+            ctl_name=f"foot_{side}_ik",
+            ctl_shape="box",
+            shape_size=13,
+            parent=leg_side.rig_ctls_grp,
+            colour=side_colour,
+            **generic_controller_group_flags,
+            mirror=True
+        )
+        foot_ik_ctl.create_ctl()
+        pm.xform(
+            foot_ik_ctl.main_grp,
+            matrix=pm.xform("foot_l_drv", matrix=True, query=True, worldSpace=True),
+            worldSpace=True,
+        )
+        foot_ankle_reverse_ctl = ros.CtrlSet(
+            ctl_name=f"foot_{side}_ankle_reverse",
+            ctl_shape="box",
+            parent=foot_ik_ctl.ctl,
+            colour=side_colour,
+            **foot_ankle_reverse_flags,
+            **generic_controller_group_flags,
+            mirror=True
+        )
+        foot_ankle_reverse_ctl.create_ctl()
+        pm.xform(
+            foot_ankle_reverse_ctl.main_grp,
+            matrix=pm.xform("foot_l_drv", matrix=True, query=True, worldSpace=True),
+            worldSpace=True, )
+        pm.xform(foot_ankle_reverse_ctl.main_grp, rotation=(0, -30, 0))
+        # pv
+        foot_pv_ctl = ros.CtrlSet(
+            ctl_name=f"foot_{side}_pv",
+            ctl_shape="star",
+            shape_size=3,
+            parent=leg_side.rig_ctls_grp,
+            colour=side_colour,
+            mirror=True,
+            **generic_controller_group_flags,
+        )
+        foot_pv_ctl.create_ctl()
+        pm.xform(
+            foot_pv_ctl.main_grp,
+            matrix=pm.xform(leg_pv_placer, matrix=True, query=True, worldSpace=True),
+            worldSpace=True,
+        )
+        # thigh_l_fk
+        thigh_fk_ctl = ros.CtrlSet(
+            ctl_name=f"thigh_{side}_fk",
+            ctl_shape="box",
+            parent=leg_side.rig_ctls_grp,
+            colour=side_colour,
+            **thigh_fk_flags,
+            **generic_controller_group_flags,
+            mirror=True
+        )
+        thigh_fk_ctl.create_ctl()
+        pm.xform(
+            thigh_fk_ctl.main_grp,
+            matrix=pm.xform("thigh_l_drv", matrix=True, query=True, worldSpace=True),
+            worldSpace=True,
+        )
+        # knee_l_fk
+        knee_fk_ctl = ros.CtrlSet(
+            ctl_name=f"calf_{side}_fk",
+            ctl_shape="box",
+            parent=thigh_fk_ctl.ctl,
+            colour=side_colour,
+            **knee_fk_flags,
+            **generic_controller_group_flags,
+            mirror=True
+        )
+        knee_fk_ctl.create_ctl()
+        pm.xform(
+            knee_fk_ctl.main_grp,
+            matrix=pm.xform("calf_l_drv", matrix=True, query=True, worldSpace=True),
+            worldSpace=True,
+        )
+        # foot_l_fk
+        foot_fk_ctl = ros.CtrlSet(
+            ctl_name=f"foot_{side}_fk",
+            ctl_shape="box",
+            shape_size=11,
+            parent=knee_fk_ctl.ctl,
+            colour=side_colour,
+            mirror=True,
+            **generic_controller_group_flags,
+        )
+        foot_fk_ctl.create_ctl()
+        pm.xform(
+            foot_fk_ctl.main_grp,
+            matrix=pm.xform("foot_l_drv", matrix=True, query=True, worldSpace=True),
+            worldSpace=True,
+        )
+
+        if side_mirror:
+            foot_drv_ctl.do_mirror()
+            foot_ik_ctl.do_mirror()
+            # foot_ankle_reverse_ctl.do_mirror()
+            foot_pv_ctl.do_mirror()
+            thigh_fk_ctl.do_mirror()
+            # knee_fk_ctl.do_mirror()
+            # foot_fk_ctl.do_mirror()
+
+        leg_side.pole_vec_obj = foot_pv_ctl.ctl
+        leg_side.ik_ctl = foot_ik_ctl
+        leg_side.ik_pv_ctl = foot_pv_ctl
+        leg_side.foot_reverse_angle_ctl = foot_ankle_reverse_ctl
+        leg_side.fk_ctls = [thigh_fk_ctl, knee_fk_ctl, foot_fk_ctl]
+        leg_side.driver_ctl = foot_drv_ctl.ctl
+        leg_side.create_limb_setup()
+
+        # add ctls to leg_l.ctl attribute, and append leg_l to rig.limbs
+        leg_side.ctls.extend(
+            [
+                foot_drv_ctl,
+                foot_ik_ctl,
+                foot_pv_ctl,
+                thigh_fk_ctl,
+                knee_fk_ctl,
+                foot_fk_ctl,
+            ]
+        )
+        rig.limbs.append(leg_side)
+
+
     # -- CONTROLLER SETUP CONSTRAINTS --
     # HIPS
 
