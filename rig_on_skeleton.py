@@ -591,9 +591,7 @@ class Rig:
         lock_hide_default_attrs(obj=self.rig_setup_grp)
         lock_hide_default_attrs(obj=self.ctls_grp)
         lock_hide_default_attrs(obj=self.driver_main_node)
-        if self.temp_rig_grp:
-            print(f"{time.perf_counter():.2f}: Deleting temp_rig_grp.")
-            pm.delete(self.temp_rig_grp)
+        delete_if_exists(obj=self.temp_rig_grp)
 
         pm.select(deselect=True)
 
