@@ -767,17 +767,6 @@ def run():
     pm.parentConstraint(scap_l.ctl, "clavicle_l_drv", maintainOffset=True)
     pm.parentConstraint(scap_r.ctl, "clavicle_r_drv", maintainOffset=True)
 
-    pm.orientConstraint(arm_l.dup_parent_joint, "upperarm_correctiveRoot_l_drv", maintainOffset=True)
-    shoulder_l_twist_half_orientconstraint = pm.orientConstraint(arm_l.pole_pin_upper_jnt, arm_l.dup_upperarm_joint,
-                                                                 "upperarm_correctiveRootCor_l_drv",
-                                                                 maintainOffset=True)
-    shoulder_l_twist_half_orientconstraint.interpType.set(2)
-    pm.orientConstraint(arm_r.dup_parent_joint, "upperarm_correctiveRoot_r_drv", maintainOffset=True)
-    shoulder_r_twist_half_orientconstraint = pm.orientConstraint(arm_r.pole_pin_upper_jnt, arm_r.dup_upperarm_joint,
-                                                                 "upperarm_correctiveRootCor_r_drv",
-                                                                 maintainOffset=True)
-    shoulder_r_twist_half_orientconstraint.interpType.set(2)
-
     # ARMS
     pm.parentConstraint(arm_l.pole_pin_upper_jnt, "upperarm_l_drv")
     pm.parentConstraint(arm_l.pole_pin_lower_jnt, "lowerarm_l_drv")
