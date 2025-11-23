@@ -595,6 +595,8 @@ class Rig:
             print(f"{time.perf_counter():.2f}: Deleting temp_rig_grp.")
             pm.delete(self.temp_rig_grp)
 
+        pm.select(deselect=True)
+
         return None
 
     def extract_ctls(self):
