@@ -812,6 +812,15 @@ def run():
         ros.lock_hide_default_attrs(control, rotate=False, translate=False)
     for control in [hand_l_drv_ctl.ctl, hand_r_drv_ctl.ctl]:  # HAND DRIVER
         ros.lock_hide_default_attrs(control)
+    # Legs
+    for limb in [rig.limbs[7], rig.limbs[8]]:  # left and right leg
+        for fk_ctl in [limb.fk_ctls[0], limb.fk_ctls[1], limb.fk_ctls[2]]:
+            ros.lock_hide_default_attrs(fk_ctl.ctl, rotate=False)
+        ros.lock_hide_default_attrs(limb.ik_pv_ctl.ctl, rotate=False, translate=False)
+        ros.lock_hide_default_attrs(limb.ik_ctl.ctl, rotate=False, translate=False)
+        ros.lock_hide_default_attrs(limb.driver_ctl)
+        limb.driver_ctl.fkik.set(1)
+
     # RIG
     # rig.rig_setup_grp.visibility.set(0)
     rig.finalise()
