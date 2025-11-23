@@ -734,6 +734,8 @@ def run():
         )
         rig.limbs.append(leg_side)
 
+        pm.refresh()
+
 
     # -- CONTROLLER SETUP CONSTRAINTS --
     # HIPS
