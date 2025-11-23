@@ -786,6 +786,13 @@ def run():
     pm.parentConstraint(arm_r.pole_pin_lower_jnt, "lowerarm_r_drv")
     pm.parentConstraint(arm_r.skin_joints[2], "hand_r_drv")
 
+    # LEGS
+    for side, limb in zip(["l", "r"], [rig.limbs[7], rig.limbs[8]]):  # left and right leg
+        pm.parentConstraint(limb.skin_joints[0], f"thigh_{side}_drv")
+        pm.parentConstraint(limb.skin_joints[1], f"calf_{side}_drv")
+        pm.parentConstraint(limb.skin_joints[2], f"foot_{side}_drv")
+
+
     # -- ATTRIBUTE FINALISING/LOCKING/HIDING --
     # HIPS
 
