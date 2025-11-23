@@ -586,11 +586,13 @@ class Rig:
         locks and hides attributes on main rig nodes
         :return: None
         """
+        print(f"{time.perf_counter():.2}: Finalising rig setup, locking groups.")
         lock_hide_default_attrs(obj=self.main_grp)
         lock_hide_default_attrs(obj=self.rig_setup_grp)
         lock_hide_default_attrs(obj=self.ctls_grp)
         lock_hide_default_attrs(obj=self.driver_main_node)
         if self.temp_rig_grp:
+            print(f"{time.perf_counter():.2}: Deleting temp_rig_grp.")
             pm.delete(self.temp_rig_grp)
 
         return None
