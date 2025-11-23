@@ -30,4 +30,9 @@ metahuman.run()
   - ![#1589F0](https://placehold.co/15x15/1589F0/1589F0.png) (Planned) Arbitrary twist bones
   - ![#1589F0](https://placehold.co/15x15/1589F0/1589F0.png) (Planned) Control Space Switching
 
-- ### (Planned) Digitigrade Leg (4 bone leg, e.g. Dog legs)
+- ### (In Progress) Digitigrade Leg (4 bone leg, e.g. Dog legs)
+  - ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png) (Working) FKIK
+  - ![#1589F0](https://placehold.co/15x15/1589F0/1589F0.png) (Planned) Pole Locking
+  - ![#1589F0](https://placehold.co/15x15/1589F0/1589F0.png) (Planned) Limb Stretch
+  - ![#1589F0](https://placehold.co/15x15/1589F0/1589F0.png) (Planned) Arbitrary twist bones
+  - ![#1589F0](https://placehold.co/15x15/1589F0/1589F0.png) (Planned) Limb Stretch
