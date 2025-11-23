@@ -520,32 +520,6 @@ def run():
     arm_r.mirror = True
     arm_r.create_three_bone_limb()
 
-    # r arm twist
-    ros.delete_if_exists("upperarm_twist_01_r_orientConstraint1_drv")
-    ros.delete_if_exists("upperarm_twist_02_r_orientConstraint1_drv")
-    ros.delete_if_exists("upperarm_correctiveRoot_r_drv_parentConstraint1")
-
-    upperarm_twist_01_oc = pm.orientConstraint(
-        arm_r.noroll_upper_joint,
-        arm_r.pole_pin_lower_jnt,
-        "upperarm_twist_01_r_drv",
-        skip=["y", "z"],
-        maintainOffset=True,
-    )
-    upperarm_twist_01_oc.interpType.set(2)
-    upperarm_twist_01_oc.attr(f"{arm_r.noroll_upper_joint}W0").set(0.8)
-    upperarm_twist_01_oc.attr(f"{arm_r.pole_pin_lower_jnt}W1").set(0.2)
-    upperarm_twist_02_oc = pm.orientConstraint(
-        arm_r.noroll_upper_joint,
-        arm_r.pole_pin_lower_jnt,
-        "upperarm_twist_02_r_drv",
-        skip=["y", "z"],
-        maintainOffset=True,
-    )
-    upperarm_twist_02_oc.interpType.set(2)
-    upperarm_twist_02_oc.attr(f"{arm_r.noroll_upper_joint}W0").set(0.4)
-    upperarm_twist_02_oc.attr(f"{arm_r.pole_pin_lower_jnt}W1").set(0.6)
-
     # add ctls to arm_r.ctl attribute, and append arm_r to rig.limbs
     arm_r.ctls.extend(
         [
