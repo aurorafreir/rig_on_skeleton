@@ -719,7 +719,7 @@ def run():
         leg_side.foot_reverse_angle_ctl = foot_ankle_reverse_ctl
         leg_side.fk_ctls = [thigh_fk_ctl, knee_fk_ctl, foot_fk_ctl]
         leg_side.driver_ctl = foot_drv_ctl.ctl
-        leg_side.create_limb_setup()
+        leg_side.create_three_bone_limb()
 
         # add ctls to leg_l.ctl attribute, and append leg_l to rig.limbs
         leg_side.ctls.extend(
