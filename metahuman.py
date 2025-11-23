@@ -389,7 +389,7 @@ def run():
     pm.refresh()
 
     # R HAND SETUP
-    pv_r_main_grp, _, pv_r_placer = ros.place_temp_pv_locators(
+    arm_pv_r_main_grp, _, arm_pv_r_placer = ros.place_temp_pv_locators(
         name="r_arm",
         upper_joint=pm.PyNode("upperarm_l_drv"),
         middle_joint=pm.PyNode("lowerarm_l_drv"),
