@@ -33,7 +33,7 @@ def run():
     rig.main_grp = "metahuman"
     rig.ensure_setup_is_correct()
 
-    driver = "DRIVER"
+    driver = rig.driver_main_node
 
     pm.refresh()
 
