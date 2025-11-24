@@ -33,7 +33,7 @@ def run():
     rig.main_grp = "metahuman"
     rig.ensure_setup_is_correct()
 
-    driver = "DRIVER"
+    driver = rig.driver_main_node
 
     pm.refresh()
 
@@ -347,32 +347,6 @@ def run():
     arm_l.driver_ctl = hand_l_drv_ctl.ctl
     arm_l.create_three_bone_limb()
 
-    # l arm twist
-    ros.delete_if_exists("upperarm_twist_01_l_orientConstraint1_drv")
-    ros.delete_if_exists("upperarm_twist_02_l_orientConstraint1_drv")
-    ros.delete_if_exists("upperarm_correctiveRoot_l_drv_parentConstraint1")
-
-    upperarm_twist_01_oc = pm.orientConstraint(
-        arm_l.noroll_upper_joint,
-        arm_l.pole_pin_lower_jnt,
-        "upperarm_twist_01_l_drv",
-        skip=["y", "z"],
-        maintainOffset=True,
-    )
-    upperarm_twist_01_oc.interpType.set(2)
-    upperarm_twist_01_oc.attr(f"{arm_l.noroll_upper_joint}W0").set(0.8)
-    upperarm_twist_01_oc.attr(f"{arm_l.pole_pin_lower_jnt}W1").set(0.2)
-    upperarm_twist_02_oc = pm.orientConstraint(
-        arm_l.noroll_upper_joint,
-        arm_l.pole_pin_lower_jnt,
-        "upperarm_twist_02_l_drv",
-        skip=["y", "z"],
-        maintainOffset=True,
-    )
-    upperarm_twist_02_oc.interpType.set(2)
-    upperarm_twist_02_oc.attr(f"{arm_l.noroll_upper_joint}W0").set(0.4)
-    upperarm_twist_02_oc.attr(f"{arm_l.pole_pin_lower_jnt}W1").set(0.6)
-
     # add ctls to arm_l.ctl attribute, and append arm_l to rig.limbs
     arm_l.ctls.extend(
         [
@@ -389,7 +363,7 @@ def run():
     pm.refresh()
 
     # R HAND SETUP
-    pv_r_main_grp, _, pv_r_placer = ros.place_temp_pv_locators(
+    arm_pv_r_main_grp, _, arm_pv_r_placer = ros.place_temp_pv_locators(
         name="r_arm",
         upper_joint=pm.PyNode("upperarm_l_drv"),
         middle_joint=pm.PyNode("lowerarm_l_drv"),
@@ -520,32 +494,6 @@ def run():
     arm_r.mirror = True
     arm_r.create_three_bone_limb()
 
-    # r arm twist
-    ros.delete_if_exists("upperarm_twist_01_r_orientConstraint1_drv")
-    ros.delete_if_exists("upperarm_twist_02_r_orientConstraint1_drv")
-    ros.delete_if_exists("upperarm_correctiveRoot_r_drv_parentConstraint1")
-
-    upperarm_twist_01_oc = pm.orientConstraint(
-        arm_r.noroll_upper_joint,
-        arm_r.pole_pin_lower_jnt,
-        "upperarm_twist_01_r_drv",
-        skip=["y", "z"],
-        maintainOffset=True,
-    )
-    upperarm_twist_01_oc.interpType.set(2)
-    upperarm_twist_01_oc.attr(f"{arm_r.noroll_upper_joint}W0").set(0.8)
-    upperarm_twist_01_oc.attr(f"{arm_r.pole_pin_lower_jnt}W1").set(0.2)
-    upperarm_twist_02_oc = pm.orientConstraint(
-        arm_r.noroll_upper_joint,
-        arm_r.pole_pin_lower_jnt,
-        "upperarm_twist_02_r_drv",
-        skip=["y", "z"],
-        maintainOffset=True,
-    )
-    upperarm_twist_02_oc.interpType.set(2)
-    upperarm_twist_02_oc.attr(f"{arm_r.noroll_upper_joint}W0").set(0.4)
-    upperarm_twist_02_oc.attr(f"{arm_r.pole_pin_lower_jnt}W1").set(0.6)
-
     # add ctls to arm_r.ctl attribute, and append arm_r to rig.limbs
     arm_r.ctls.extend(
         [
@@ -558,6 +506,184 @@ def run():
         ]
     )
     rig.limbs.append(arm_r)
+
+    # LEGS
+    foot_ankle_reverse_flags = {"shape_size": [3, 10, 10], "transform_shape": [-7, 0, 5]}
+    thigh_fk_flags = {"shape_size": [30, 15, 15], "transform_shape": [-15, 0, 0]}
+    knee_fk_flags = {"shape_size": [25, 11, 11], "transform_shape": [-13, 0, 0]}
+    # ankle_fk_flags = {"shape_size": [16, 11, 11], "transform_shape": [5, 0, 0]}
+
+    # LEG SETUP  (L and R are mirrored position-wise, so we can use the Left side's transforms and flip them post build
+
+    for side in ["l", "r"]:
+        side_mirror = True if side == "r" else False
+        side_colour = ros.right_col if side == "r" else ros.left_col
+
+        leg_pv_main_grp, _, leg_pv_placer = ros.place_temp_pv_locators(
+            name=f"{side}_leg",
+            upper_joint=pm.PyNode(f"thigh_l_drv"),
+            middle_joint=pm.PyNode(f"calf_l_drv"),
+            lower_joint=pm.PyNode(f"foot_l_drv"),
+            pv_x_multiplier=.7
+        )
+        pm.parent(leg_pv_main_grp, rig.temp_rig_grp)
+        leg_side = ros.ThreeBoneLimb()
+
+        leg_side.limb_name = f"leg_{side}"
+        leg_side.input_joints = [f"thigh_{side}_drv", f"calf_{side}_drv", f"foot_{side}_drv"]
+        leg_side.ikfk_suffix_replace = "_drv"
+        leg_side.driver_object = driver
+        leg_side.rig_parent = rig.rig_setup_grp
+        leg_side.ctl_parent = rig.ctls_grp
+        leg_side.rig_upper_obj = hip_ctl.ctl
+        leg_side.verbose = print_errors
+        leg_side.create_limb_setup()
+        # CONTROLS #
+        # driver
+        foot_drv_ctl = ros.CtrlSet(
+            ctl_name=f"foot_{side}_driver",
+            ctl_shape="star",
+            shape_size=2,
+            transform_shape=[5, -7, 0],
+            parent=leg_side.rig_ctls_grp,
+            colour=ros.driver_col,
+            **generic_controller_group_flags,
+            mirror=True
+        )
+        foot_drv_ctl.create_ctl()
+        pm.xform(
+            foot_drv_ctl.main_grp,
+            matrix=pm.xform("foot_l_drv", matrix=True, query=True, worldSpace=True),
+            worldSpace=True,
+        )
+        # ik
+        foot_ik_ctl = ros.CtrlSet(
+            ctl_name=f"foot_{side}_ik",
+            ctl_shape="box",
+            shape_size=13,
+            parent=leg_side.rig_ctls_grp,
+            colour=side_colour,
+            **generic_controller_group_flags,
+            mirror=True
+        )
+        foot_ik_ctl.create_ctl()
+        pm.xform(
+            foot_ik_ctl.main_grp,
+            matrix=pm.xform("foot_l_drv", matrix=True, query=True, worldSpace=True),
+            worldSpace=True,
+        )
+        foot_ankle_reverse_ctl = ros.CtrlSet(
+            ctl_name=f"foot_{side}_ankle_reverse",
+            ctl_shape="box",
+            parent=foot_ik_ctl.ctl,
+            colour=side_colour,
+            **foot_ankle_reverse_flags,
+            **generic_controller_group_flags,
+            mirror=True
+        )
+        foot_ankle_reverse_ctl.create_ctl()
+        pm.xform(
+            foot_ankle_reverse_ctl.main_grp,
+            matrix=pm.xform("foot_l_drv", matrix=True, query=True, worldSpace=True),
+            worldSpace=True, )
+        pm.xform(foot_ankle_reverse_ctl.main_grp, rotation=(0, -30, 0))
+        # pv
+        foot_pv_ctl = ros.CtrlSet(
+            ctl_name=f"foot_{side}_pv",
+            ctl_shape="star",
+            shape_size=3,
+            parent=leg_side.rig_ctls_grp,
+            colour=side_colour,
+            mirror=True,
+            **generic_controller_group_flags,
+        )
+        foot_pv_ctl.create_ctl()
+        pm.xform(
+            foot_pv_ctl.main_grp,
+            matrix=pm.xform(leg_pv_placer, matrix=True, query=True, worldSpace=True),
+            worldSpace=True,
+        )
+        # thigh_l_fk
+        thigh_fk_ctl = ros.CtrlSet(
+            ctl_name=f"thigh_{side}_fk",
+            ctl_shape="box",
+            parent=leg_side.rig_ctls_grp,
+            colour=side_colour,
+            **thigh_fk_flags,
+            **generic_controller_group_flags,
+            mirror=True
+        )
+        thigh_fk_ctl.create_ctl()
+        pm.xform(
+            thigh_fk_ctl.main_grp,
+            matrix=pm.xform("thigh_l_drv", matrix=True, query=True, worldSpace=True),
+            worldSpace=True,
+        )
+        # knee_l_fk
+        knee_fk_ctl = ros.CtrlSet(
+            ctl_name=f"calf_{side}_fk",
+            ctl_shape="box",
+            parent=thigh_fk_ctl.ctl,
+            colour=side_colour,
+            **knee_fk_flags,
+            **generic_controller_group_flags,
+            mirror=True
+        )
+        knee_fk_ctl.create_ctl()
+        pm.xform(
+            knee_fk_ctl.main_grp,
+            matrix=pm.xform("calf_l_drv", matrix=True, query=True, worldSpace=True),
+            worldSpace=True,
+        )
+        # foot_l_fk
+        foot_fk_ctl = ros.CtrlSet(
+            ctl_name=f"foot_{side}_fk",
+            ctl_shape="box",
+            shape_size=11,
+            parent=knee_fk_ctl.ctl,
+            colour=side_colour,
+            mirror=True,
+            **generic_controller_group_flags,
+        )
+        foot_fk_ctl.create_ctl()
+        pm.xform(
+            foot_fk_ctl.main_grp,
+            matrix=pm.xform("foot_l_drv", matrix=True, query=True, worldSpace=True),
+            worldSpace=True,
+        )
+
+        if side_mirror:
+            foot_drv_ctl.do_mirror()
+            foot_ik_ctl.do_mirror()
+            # foot_ankle_reverse_ctl.do_mirror()
+            foot_pv_ctl.do_mirror()
+            thigh_fk_ctl.do_mirror()
+            # knee_fk_ctl.do_mirror()
+            # foot_fk_ctl.do_mirror()
+
+        leg_side.pole_vec_obj = foot_pv_ctl.ctl
+        leg_side.ik_ctl = foot_ik_ctl
+        leg_side.ik_pv_ctl = foot_pv_ctl
+        leg_side.foot_reverse_angle_ctl = foot_ankle_reverse_ctl
+        leg_side.fk_ctls = [thigh_fk_ctl, knee_fk_ctl, foot_fk_ctl]
+        leg_side.driver_ctl = foot_drv_ctl.ctl
+        leg_side.create_three_bone_limb()
+
+        # add ctls to leg_l.ctl attribute, and append leg_l to rig.limbs
+        leg_side.ctls.extend(
+            [
+                foot_drv_ctl,
+                foot_ik_ctl,
+                foot_pv_ctl,
+                thigh_fk_ctl,
+                knee_fk_ctl,
+                foot_fk_ctl,
+            ]
+        )
+        rig.limbs.append(leg_side)
+
+        pm.refresh()
+
 
     # -- CONTROLLER SETUP CONSTRAINTS --
     # HIPS
@@ -575,6 +701,10 @@ def run():
     pm.parentConstraint(arm_l.skin_joints[2], hand_l_drv_ctl.main_grp)
     pm.parentConstraint(arm_r.skin_joints[2], hand_r_drv_ctl.main_grp)
 
+    # LEGS
+    pm.parentConstraint(hip_ctl.ctl, rig.limbs[7].fk_ctls[0].main_grp, maintainOffset=True)
+    pm.parentConstraint(hip_ctl.ctl, rig.limbs[8].fk_ctls[0].main_grp, maintainOffset=True)
+
     # -- CONTROLLER TO SKELETON CONSTRAINTS --
     # HIPS
     pm.parentConstraint(root_ctl.ctl, "root_drv", maintainOffset=True)
@@ -587,17 +717,6 @@ def run():
     pm.parentConstraint(scap_l.ctl, "clavicle_l_drv", maintainOffset=True)
     pm.parentConstraint(scap_r.ctl, "clavicle_r_drv", maintainOffset=True)
 
-    pm.orientConstraint(arm_l.dup_parent_joint, "upperarm_correctiveRoot_l_drv", maintainOffset=True)
-    shoulder_l_twist_half_orientconstraint = pm.orientConstraint(arm_l.pole_pin_upper_jnt, arm_l.dup_upperarm_joint,
-                                                                 "upperarm_correctiveRootCor_l_drv",
-                                                                 maintainOffset=True)
-    shoulder_l_twist_half_orientconstraint.interpType.set(2)
-    pm.orientConstraint(arm_r.dup_parent_joint, "upperarm_correctiveRoot_r_drv", maintainOffset=True)
-    shoulder_r_twist_half_orientconstraint = pm.orientConstraint(arm_r.pole_pin_upper_jnt, arm_r.dup_upperarm_joint,
-                                                                 "upperarm_correctiveRootCor_r_drv",
-                                                                 maintainOffset=True)
-    shoulder_r_twist_half_orientconstraint.interpType.set(2)
-
     # ARMS
     pm.parentConstraint(arm_l.pole_pin_upper_jnt, "upperarm_l_drv")
     pm.parentConstraint(arm_l.pole_pin_lower_jnt, "lowerarm_l_drv")
@@ -605,6 +724,13 @@ def run():
     pm.parentConstraint(arm_r.pole_pin_upper_jnt, "upperarm_r_drv")
     pm.parentConstraint(arm_r.pole_pin_lower_jnt, "lowerarm_r_drv")
     pm.parentConstraint(arm_r.skin_joints[2], "hand_r_drv")
+
+    # LEGS
+    for side, limb in zip(["l", "r"], [rig.limbs[7], rig.limbs[8]]):  # left and right leg
+        pm.parentConstraint(limb.skin_joints[0], f"thigh_{side}_drv")
+        pm.parentConstraint(limb.skin_joints[1], f"calf_{side}_drv")
+        pm.parentConstraint(limb.skin_joints[2], f"foot_{side}_drv")
+
 
     # -- ATTRIBUTE FINALISING/LOCKING/HIDING --
     # HIPS
@@ -632,6 +758,15 @@ def run():
         ros.lock_hide_default_attrs(control, rotate=False, translate=False)
     for control in [hand_l_drv_ctl.ctl, hand_r_drv_ctl.ctl]:  # HAND DRIVER
         ros.lock_hide_default_attrs(control)
+    # Legs
+    for limb in [rig.limbs[7], rig.limbs[8]]:  # left and right leg
+        for fk_ctl in [limb.fk_ctls[0], limb.fk_ctls[1], limb.fk_ctls[2]]:
+            ros.lock_hide_default_attrs(fk_ctl.ctl, rotate=False)
+        ros.lock_hide_default_attrs(limb.ik_pv_ctl.ctl, rotate=False, translate=False)
+        ros.lock_hide_default_attrs(limb.ik_ctl.ctl, rotate=False, translate=False)
+        ros.lock_hide_default_attrs(limb.driver_ctl)
+        limb.driver_ctl.fkik.set(1)
+
     # RIG
     # rig.rig_setup_grp.visibility.set(0)
     rig.finalise()
