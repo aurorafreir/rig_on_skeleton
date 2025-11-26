@@ -226,6 +226,7 @@ def run():
         middle_joint=pm.PyNode("lowerarm_l_drv"),
         lower_joint=pm.PyNode("hand_l_drv"),
     )
+    pm.parent(arm_pv_l_main_grp, rig.temp_rig_grp)
 
     arm_l = ros.ThreeBoneLimb()
     arm_l.limb_name = "arm_l"
@@ -362,6 +363,7 @@ def run():
         middle_joint=pm.PyNode("lowerarm_l_drv"),
         lower_joint=pm.PyNode("hand_l_drv"),
     )
+    pm.parent(arm_pv_r_main_grp, rig.temp_rig_grp)
 
     arm_r = ros.ThreeBoneLimb()
     arm_r.limb_name = "arm_r"
@@ -514,6 +516,8 @@ def run():
             lower_joint=pm.PyNode(f"foot_l_drv"),
             pv_x_multiplier=.7
         )
+        pm.parent(leg_pv_main_grp, rig.temp_rig_grp)
+
         leg_side = ros.DigiLegLimb()
         leg_side.limb_name = f"leg_{side}"
         leg_side.input_joints = [f"thigh_{side}_drv", f"knee_{side}_drv", f"ankle_{side}_drv", f"foot_{side}_drv"]
@@ -790,7 +794,6 @@ def run():
     rig.finalise()
 
     # FINALISING
-    pm.delete(arm_pv_l_main_grp, arm_pv_r_main_grp)
 
     print(f"{time.perf_counter():.2f}: Finished building '{rig.main_grp}'")
 
