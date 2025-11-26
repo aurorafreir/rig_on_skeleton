@@ -504,10 +504,11 @@ def run():
     knee_fk_flags = {"shape_size": [25, 11, 11], "transform_shape": [13, 0, 0]}
     ankle_fk_flags = {"shape_size": [16, 11, 11], "transform_shape": [5, 0, 0]}
 
-    # L LEG SETUP
+    # LEG SETUP
 
     for side in ["l", "r"]:
         side_mirror = True if side == "r" else False
+        side_colour = ros.right_col if side == "r" else ros.left_col
 
         leg_pv_main_grp, _, leg_pv_placer = ros.place_temp_pv_locators(
             name=f"{side}_leg",
@@ -552,7 +553,7 @@ def run():
             ctl_shape="box",
             shape_size=13,
             parent=leg_side.rig_ctls_grp,
-            colour=ros.left_col,
+            colour=side_colour,
             **generic_controller_group_flags,
             mirror=True
         )
@@ -566,7 +567,7 @@ def run():
             ctl_name=f"foot_{side}_ankle_reverse",
             ctl_shape="box",
             parent=foot_ik_ctl.ctl,
-            colour=ros.left_col,
+            colour=side_colour,
             **foot_ankle_reverse_flags,
             **generic_controller_group_flags,
             mirror=True
@@ -583,7 +584,7 @@ def run():
             ctl_shape="star",
             shape_size=3,
             parent=leg_side.rig_ctls_grp,
-            colour=ros.left_col,
+            colour=side_colour,
             mirror=True,
             **generic_controller_group_flags,
         )
@@ -598,7 +599,7 @@ def run():
             ctl_name=f"thigh_{side}_fk",
             ctl_shape="box",
             parent=leg_side.rig_ctls_grp,
-            colour=ros.left_col,
+            colour=side_colour,
             **thigh_fk_flags,
             **generic_controller_group_flags,
             mirror=True
@@ -614,7 +615,7 @@ def run():
             ctl_name=f"knee_{side}_fk",
             ctl_shape="box",
             parent=thigh_fk_ctl.ctl,
-            colour=ros.left_col,
+            colour=side_colour,
             **knee_fk_flags,
             **generic_controller_group_flags,
             mirror=True
@@ -630,7 +631,7 @@ def run():
             ctl_name=f"ankle_{side}_fk",
             ctl_shape="box",
             parent=knee_fk_ctl.ctl,
-            colour=ros.left_col,
+            colour=side_colour,
             **ankle_fk_flags,
             **generic_controller_group_flags,
             mirror=True
@@ -647,7 +648,7 @@ def run():
             ctl_shape="box",
             shape_size=11,
             parent=ankle_fk_ctl.ctl,
-            colour=ros.left_col,
+            colour=side_colour,
             mirror=True,
             **generic_controller_group_flags,
         )
