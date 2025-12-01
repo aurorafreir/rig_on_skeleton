@@ -711,6 +711,12 @@ def run(visual_build:bool=False):
         side_colour = ros.right_col if side == "r" else ros.left_col
 
         hand_side = ros.Limb()
+        hand_side.limb_name = f"hand_{side}"
+        hand_side.rig_parent = rig.rig_setup_grp
+        hand_side.ctl_parent = rig.ctls_grp
+        hand_side.create_limb_setup()
+
+        rig.limbs.append(hand_side)
 
         for finger in ["thumb", "index", "middle", "ring", "pinky"]:
             finger_limb = ros.Limb()
