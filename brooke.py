@@ -187,7 +187,7 @@ def run(visual_build:bool=False):
     scap_l.create_ctl()
     pm.xform(
         scap_l.main_grp,
-        t=pm.xform("clavicle_l_drv", t=True, query=True, worldSpace=True),
+        t=pm.xform("shoulder_l_drv", t=True, query=True, worldSpace=True),
         worldSpace=True,
     )
 
@@ -214,7 +214,7 @@ def run(visual_build:bool=False):
     scap_r.create_ctl()
     pm.xform(
         scap_r.main_grp,
-        t=pm.xform("clavicle_l_drv", t=True, query=True, worldSpace=True),
+        t=pm.xform("shoulder_l_drv", t=True, query=True, worldSpace=True),
         worldSpace=True,
     )
     scap_r.do_mirror()
@@ -803,8 +803,8 @@ def run(visual_build:bool=False):
     pm.parentConstraint(neck_02.ctl, "neck_02_drv")
     pm.parentConstraint(head.ctl, "head_drv")
     # SHOULDERS
-    pm.parentConstraint(scap_l.ctl, "clavicle_l_drv", maintainOffset=True)
-    pm.parentConstraint(scap_r.ctl, "clavicle_r_drv", maintainOffset=True)
+    pm.parentConstraint(scap_l.ctl, "shoulder_l_drv", maintainOffset=True)
+    pm.parentConstraint(scap_r.ctl, "shoulder_r_drv", maintainOffset=True)
 
     # ARMS
     pm.parentConstraint(arm_l.pole_pin_upper_jnt, "upperarm_l_drv")
