@@ -769,6 +769,9 @@ def run(visual_build:bool=False):
                      matrix=pm.xform(f"{finger}_02_{side}_drv", matrix=True, query=True, worldSpace=True),
                      worldSpace=True)
 
+            if visual_build:
+                pm.refresh()
+
     # -- CONTROLLER SETUP CONSTRAINTS --
     # HIPS
 
