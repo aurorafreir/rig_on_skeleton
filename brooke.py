@@ -723,8 +723,8 @@ def run(visual_build:bool=False):
             finger_limb.limb_name = f"{finger}_{side}"
             finger_limb.driver_object = arm_l.driver_ctl if side == "l" else arm_r.driver_ctl
             finger_limb.rig_parent = rig.rig_setup_grp
-            finger_limb.ctl_parent = rig.ctls_grp
-            finger_limb.rig_upper_obj = arm_l.skin_joints[2] if side == "l" else arm_r.skin_joints[2]
+            finger_limb.ctl_parent = hand_side.rig_ctls_grp
+            finger_limb.rig_upper_obj = hand_side.rig_ctls_grp
             finger_limb.verbose = print_errors
             finger_limb.create_limb_setup()
 
@@ -733,7 +733,7 @@ def run(visual_build:bool=False):
                 ctl_name=f"{finger}_00_{side}",
                 ctl_shape="box",
                 shape_size=3,
-                parent=finger_limb.rig_upper_obj,
+                parent=finger_limb.rig_ctls_grp,
                 colour=side_colour,
                 **generic_controller_group_flags,
                 mirror=True
@@ -784,6 +784,10 @@ def run(visual_build:bool=False):
     pm.parentConstraint(scap_r.ctl, upperarm_r_fk_ctl.main_grp, maintainOffset=True)
     pm.parentConstraint(arm_l.skin_joints[2], hand_l_drv_ctl.main_grp)
     pm.parentConstraint(arm_r.skin_joints[2], hand_r_drv_ctl.main_grp)
+
+    # HANDS
+    pm.parentConstraint(arm_l.skin_joints[2], rig.limbs[9].rig_ctls_grp, maintainOffset=True)
+    pm.parentConstraint(arm_r.skin_joints[2], rig.limbs[10].rig_ctls_grp, maintainOffset=True)
 
     # LEGS
     pm.parentConstraint(hip_ctl.ctl, leg_side.fk_ctls[0].main_grp, maintainOffset=True)
