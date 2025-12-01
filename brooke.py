@@ -865,10 +865,9 @@ def run(visual_build:bool=False):
     rig.finalise()
 
     # FINALISING
-
-    print(f"{time.perf_counter():.2f}: Finished building '{rig.main_grp}'")
-
     print(f"limbs: {[i.limb_name for i in rig.limbs]}")
     print(f"limb ctls: {[[y.ctl_name for y in i.ctls] for i in rig.limbs]}")
+    end_time = time.perf_counter()
+    print(f"rig build time: {end_time - start_time:.2f}s")
 
     return rig
