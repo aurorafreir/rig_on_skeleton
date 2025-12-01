@@ -351,6 +351,7 @@ class CtrlSet:
             colour=None,
             parent=None,
             spaces=None,
+            prints: bool = False,
     ):
         self.ctl_name = ctl_name
         self.offset = offset
@@ -418,6 +419,8 @@ class CtrlSet:
             (0.2, -0.2, 0),
             (1, 0, 0),
         ]
+
+        self.prints = prints
 
     def transform_shape_list(self, shape_list):
         """
@@ -507,7 +510,8 @@ class CtrlSet:
 
         pm.select(d=True)
 
-        print(
+        if self.prints:
+            print(
             f"{time.perf_counter()}: Created controller set {self.ctl_name} with objects {obj_order}"
         )
 
