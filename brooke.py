@@ -25,8 +25,9 @@ brooke.run()
 """
 
 
-def run():
-    print_errors = True
+def run(visual_build:bool=False):
+    print_errors = False
+    start_time = time.perf_counter()
 
     # -- FIRST SETUP --
     rig = ros.Rig()
@@ -35,7 +36,8 @@ def run():
 
     driver = rig.driver_main_node
 
-    pm.refresh()
+    if visual_build:
+        pm.refresh()
 
     # -- CONTROLLER SETUP --
     generic_controller_group_flags = {"offset": True, "spaceswitch": True}
@@ -76,7 +78,8 @@ def run():
     root_limb.ctls.extend([global_ctl, global_off_ctl, root_ctl])
     rig.limbs.append(root_limb)
 
-    pm.refresh()
+    if visual_build:
+        pm.refresh()
 
     # -- HIP CONTROLS --
     hip_limb = ros.Limb()
@@ -105,7 +108,8 @@ def run():
     hip_limb.ctls.extend([hip_ctl])
     rig.limbs.append(hip_limb)
 
-    pm.refresh()
+    if visual_build:
+        pm.refresh()
 
     # -- NECK AND HEAD --
     neck_and_head_limb = ros.Limb()
@@ -162,7 +166,8 @@ def run():
     neck_and_head_limb.ctls.extend([neck_01, neck_02, head])
     rig.limbs.append(neck_and_head_limb)
 
-    pm.refresh()
+    if visual_build:
+        pm.refresh()
 
     # -- SHOULDERS --
     shoulder_l = ros.Limb()
@@ -189,7 +194,8 @@ def run():
     shoulder_l.ctls.append(scap_l)
     rig.limbs.append(shoulder_l)
 
-    pm.refresh()
+    if visual_build:
+        pm.refresh()
 
     shoulder_r = ros.Limb()
     shoulder_r.limb_name = "shoulder_r"
@@ -216,7 +222,8 @@ def run():
     shoulder_r.ctls.append(scap_r)
     rig.limbs.append(shoulder_r)
 
-    pm.refresh()
+    if visual_build:
+        pm.refresh()
 
     # -- ARMS --
     # L HAND SETUP
@@ -354,7 +361,8 @@ def run():
     )
     rig.limbs.append(arm_l)
 
-    pm.refresh()
+    if visual_build:
+        pm.refresh()
 
     # R HAND SETUP
     arm_pv_r_main_grp, _, arm_pv_r_placer = ros.place_temp_pv_locators(
@@ -497,6 +505,9 @@ def run():
         ]
     )
     rig.limbs.append(arm_r)
+
+    if visual_build:
+        pm.refresh()
 
     # -- LEGS --
     foot_ankle_reverse_flags = {"shape_size": [3, 10, 10], "transform_shape": [-7, 0, 5]}
@@ -691,7 +702,8 @@ def run():
         )
         rig.limbs.append(leg_side)
 
-    pm.refresh()
+        if visual_build:
+            pm.refresh()
 
     # - FINGERS -
     for side in ["l", "r"]:
