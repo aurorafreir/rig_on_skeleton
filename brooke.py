@@ -693,6 +693,64 @@ def run():
 
     pm.refresh()
 
+    # - FINGERS -
+    for side in ["l", "r"]:
+        side_mirror = True if side == "r" else False
+        side_colour = ros.right_col if side == "r" else ros.left_col
+
+        hand_side = ros.Limb()
+
+        for finger in ["thumb", "index", "middle", "ring", "pinky"]:
+            finger_limb = ros.Limb()
+            finger_limb.limb_name = f"{finger}_{side}"
+            finger_limb.driver_object = arm_l.driver_ctl if side == "l" else arm_r.driver_ctl
+            finger_limb.rig_parent = rig.rig_setup_grp
+            finger_limb.ctl_parent = rig.ctls_grp
+            finger_limb.rig_upper_obj = arm_l.skin_joints[2] if side == "l" else arm_r.skin_joints[2]
+            finger_limb.verbose = print_errors
+            finger_limb.create_limb_setup()
+
+            # CONTROLS #
+            meta_00_ctl = ros.CtrlSet(
+                ctl_name=f"{finger}_00_{side}",
+                ctl_shape="box",
+                shape_size=3,
+                parent=finger_limb.rig_upper_obj,
+                colour=side_colour,
+                **generic_controller_group_flags,
+                mirror=True
+            )
+            meta_00_ctl.create_ctl()
+            pm.xform(meta_00_ctl.main_grp,
+                     matrix=pm.xform(f"{finger}_00_{side}_drv", matrix=True, query=True, worldSpace=True),
+                     worldSpace=True)
+            meta_01_ctl = ros.CtrlSet(
+                ctl_name=f"{finger}_01_{side}",
+                ctl_shape="box",
+                shape_size=3,
+                parent=meta_00_ctl.ctl,
+                colour=side_colour,
+                **generic_controller_group_flags,
+                mirror=True
+            )
+            meta_01_ctl.create_ctl()
+            pm.xform(meta_01_ctl.main_grp,
+                     matrix=pm.xform(f"{finger}_01_{side}_drv", matrix=True, query=True, worldSpace=True),
+                     worldSpace=True)
+            meta_02_ctl = ros.CtrlSet(
+                ctl_name=f"{finger}_02_{side}",
+                ctl_shape="box",
+                shape_size=3,
+                parent=meta_01_ctl.ctl,
+                colour=side_colour,
+                **generic_controller_group_flags,
+                mirror=True
+            )
+            meta_02_ctl.create_ctl()
+            pm.xform(meta_02_ctl.main_grp,
+                     matrix=pm.xform(f"{finger}_02_{side}_drv", matrix=True, query=True, worldSpace=True),
+                     worldSpace=True)
+
     # -- CONTROLLER SETUP CONSTRAINTS --
     # HIPS
 
