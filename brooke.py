@@ -772,6 +772,12 @@ def run(visual_build:bool=False):
             if visual_build:
                 pm.refresh()
 
+    # cleaner object names after loop-based build
+    leg_l = rig.limbs[7]
+    leg_r = rig.limbs[8]
+    hand_l = rig.limbs[9]
+    hand_r = rig.limbs[10]
+
     # -- CONTROLLER SETUP CONSTRAINTS --
     # HIPS
 
@@ -789,8 +795,8 @@ def run(visual_build:bool=False):
     pm.parentConstraint(arm_r.skin_joints[2], hand_r_drv_ctl.main_grp)
 
     # HANDS
-    pm.parentConstraint(arm_l.skin_joints[2], rig.limbs[9].rig_ctls_grp, maintainOffset=True)
-    pm.parentConstraint(arm_r.skin_joints[2], rig.limbs[10].rig_ctls_grp, maintainOffset=True)
+    pm.parentConstraint(arm_l.skin_joints[2], hand_l.rig_ctls_grp, maintainOffset=True)
+    pm.parentConstraint(arm_r.skin_joints[2], hand_r.rig_ctls_grp, maintainOffset=True)
 
     # LEGS
     pm.parentConstraint(hip_ctl.ctl, leg_side.fk_ctls[0].main_grp, maintainOffset=True)
