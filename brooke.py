@@ -149,8 +149,8 @@ def run(visual_build:bool=False):
     head = ros.CtrlSet(
         ctl_name="head",
         ctl_shape="box",
-        shape_size=[15, 20, 15],
-        transform_shape=[3, -2, 0],
+        shape_size=[15, 15, 20],
+        transform_shape=[5, 0, -3],
         parent=neck_02.ctl,
         colour=ros.centre_col,
         **generic_controller_group_flags
