@@ -799,9 +799,8 @@ def run(visual_build:bool=False):
     pm.parentConstraint(arm_r.skin_joints[2], hand_r.rig_ctls_grp, maintainOffset=True)
 
     # LEGS
-    # pm.parentConstraint(hip_ctl.ctl, leg_side.fk_ctls[0].main_grp, maintainOffset=True)
-    # pm.parentConstraint(leg_side.skin_joints[3], foot_drv_ctl.main_grp, maintainOffset=True)
-    # pm.orientConstraint(leg_side.ik_driver_bottom_rotate_joint, foot_ankle_reverse_ctl.main_grp, maintainOffset=True)
+    pm.parentConstraint(hip_ctl.ctl, leg_l.fk_ctls[0].main_grp, maintainOffset=True)
+    pm.parentConstraint(hip_ctl.ctl, leg_r.fk_ctls[0].main_grp, maintainOffset=True)
     pm.parentConstraint(leg_l.skin_joints[3], leg_l.driver_ctl.main_grp, maintainOffset=True)
     pm.parentConstraint(leg_r.skin_joints[3], leg_r.driver_ctl.main_grp, maintainOffset=True)
 
