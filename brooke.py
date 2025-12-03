@@ -826,11 +826,16 @@ def run(visual_build:bool=False):
     pm.parentConstraint(arm_r.skin_joints[2], "hand_r_drv")
 
     # LEGS
-    # pm.parentConstraint(leg_side.skin_joints[0], "thigh_l_drv")
-    # pm.parentConstraint(leg_side.skin_joints[1], "knee_l_drv")
-    # pm.parentConstraint(leg_side.skin_joints[2], "ankle_l_drv")
-    # pm.parentConstraint(leg_side.skin_joints[3], "foot_l_drv")
-    # pm.parentConstraint(foot_ik_ctl.ctl, foot_pv_ctl.main_grp, maintainOffset=True)  # TEMP UNTIL SPACE SWITCH WORKS
+    pm.parentConstraint(leg_l.skin_joints[0], "thigh_l_drv")
+    pm.parentConstraint(leg_l.skin_joints[1], "knee_l_drv")
+    pm.parentConstraint(leg_l.skin_joints[2], "ankle_l_drv")
+    pm.parentConstraint(leg_l.skin_joints[3], "foot_l_drv")
+    pm.parentConstraint(leg_l.ik_ctl.ctl, leg_l.ik_pv_ctl.main_grp, maintainOffset=True)  # TEMP UNTIL SPACE SWITCH WORKS
+    pm.parentConstraint(leg_r.skin_joints[0], "thigh_r_drv")
+    pm.parentConstraint(leg_r.skin_joints[1], "knee_r_drv")
+    pm.parentConstraint(leg_r.skin_joints[2], "ankle_r_drv")
+    pm.parentConstraint(leg_r.skin_joints[3], "foot_r_drv")
+    pm.parentConstraint(leg_r.ik_ctl.ctl, leg_r.ik_pv_ctl.main_grp, maintainOffset=True)  # TEMP UNTIL SPACE SWITCH WORKS
 
     # -- ATTRIBUTE FINALISING/LOCKING/HIDING --
     # HIPS
