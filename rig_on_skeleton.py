@@ -580,6 +580,16 @@ class CtrlSet:
                 "degree": 3,
                 "point": self.transform_shape_list(shape_list=self.star),
             }
+        if self.ctl_shape == "circle":
+            ctl_kwargs = {
+                "degree": 1,
+                "point": self.transform_shape_list(shape_list=[[x*.1, y*.1, z*.1] for x, y, z in self.circle]), # bit grim
+            }
+        if self.ctl_shape == "sphere":
+            ctl_kwargs = {
+                "degree": 1,
+                "point": self.transform_shape_list(shape_list=[[x*.1, y*.1, z*.1] for x, y, z in self.sphere]), # bit grim
+            }
 
         self.ctl = pm.curve(n=f"{self.ctl_name}_{self.ctl_suffix}", **ctl_kwargs)
         if self.ctl_shape == "star":
