@@ -649,7 +649,7 @@ class Limb:
         self.ik_ctl: pm.nt.Transform = None,
         self.ik_pv_ctl: pm.nt.Transform = None,
         self.fk_ctls: list = None,
-        self.driver_ctl: pm.nt.Transform = None,
+        self.driver_ctl: CtrlSet = None,
 
         self.aim_axis: list = [1, 0, 0]
 
@@ -842,7 +842,7 @@ class ThreeBoneLimb(Limb):
 
         # Attribute creation
         limb_ik_controls_attr = Attr(
-            main_object=self.driver_ctl,
+            main_object=self.driver_ctl.ctl,
             attr_name="ik_controls",
             nice_name="IK CONTROLS",
             dummy_attr=True,
@@ -850,7 +850,7 @@ class ThreeBoneLimb(Limb):
         )
         limb_ik_controls_attr.create_attr()
         limb_fkik = Attr(
-            main_object=self.driver_ctl,
+            main_object=self.driver_ctl.ctl,
             attr_name="fkik",
             nice_name="FKIK",
             driver_prefix=self.limb_name,
@@ -860,7 +860,7 @@ class ThreeBoneLimb(Limb):
         limb_fkik.create_attr()
 
         if self.verbose:
-            print(f"Created attributes for {self.limb_name} on {self.driver_ctl}")
+            print(f"Created attributes for {self.limb_name} on {self.driver_ctl.ctl}")
 
         fkik_rev = pm.createNode(
             "floatMath", name=f"{self.limb_name}_fkik_rev_floatmath"
@@ -950,7 +950,7 @@ class ThreeBoneLimb(Limb):
         if self.pole_lock:
             # Attribute creation
             limb_pole_lock = Attr(
-                main_object=self.driver_ctl,
+                main_object=self.driver_ctl.ctl,
                 attr_name="pole_lock",
                 nice_name="Pole Vec Lock",
                 driver_prefix=f"{self.limb_name}",
@@ -1119,7 +1119,7 @@ class DigiLegLimb(Limb):
 
         # Attribute creation
         limb_ik_controls_attr = Attr(
-            main_object=self.driver_ctl,
+            main_object=self.driver_ctl.ctl,
             attr_name="ik_controls",
             nice_name="IK CONTROLS",
             dummy_attr=True,
@@ -1127,7 +1127,7 @@ class DigiLegLimb(Limb):
         )
         limb_ik_controls_attr.create_attr()
         limb_fkik = Attr(
-            main_object=self.driver_ctl,
+            main_object=self.driver_ctl.ctl,
             attr_name="fkik",
             nice_name="FKIK",
             driver_prefix=self.limb_name,

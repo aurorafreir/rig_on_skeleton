@@ -344,7 +344,7 @@ def run():
     arm_l.ik_ctl = hand_l_ik_ctl
     arm_l.ik_pv_ctl = hand_l_pv_ctl
     arm_l.fk_ctls = [upperarm_l_fk_ctl, lowerarm_l_fk_ctl, hand_l_fk_ctl]
-    arm_l.driver_ctl = hand_l_drv_ctl.ctl
+    arm_l.driver_ctl = hand_l_drv_ctl
     arm_l.create_three_bone_limb()
 
     # add ctls to arm_l.ctl attribute, and append arm_l to rig.limbs
@@ -490,7 +490,7 @@ def run():
     arm_r.ik_ctl = hand_r_ik_ctl
     arm_r.ik_pv_ctl = hand_r_pv_ctl
     arm_r.fk_ctls = [upperarm_r_fk_ctl, lowerarm_r_fk_ctl, hand_r_fk_ctl]
-    arm_r.driver_ctl = hand_r_drv_ctl.ctl
+    arm_r.driver_ctl = hand_r_drv_ctl
     arm_r.mirror = True
     arm_r.create_three_bone_limb()
 
@@ -666,7 +666,7 @@ def run():
         leg_side.ik_pv_ctl = foot_pv_ctl
         leg_side.foot_reverse_angle_ctl = foot_ankle_reverse_ctl
         leg_side.fk_ctls = [thigh_fk_ctl, knee_fk_ctl, foot_fk_ctl]
-        leg_side.driver_ctl = foot_drv_ctl.ctl
+        leg_side.driver_ctl = foot_drv_ctl
         leg_side.create_three_bone_limb()
 
         # add ctls to leg_l.ctl attribute, and append leg_l to rig.limbs
