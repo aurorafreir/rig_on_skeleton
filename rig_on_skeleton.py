@@ -254,6 +254,8 @@ def weighted_floatmath_attr_connect(in_obj, out_obj, attrs: list, weight: float 
 def ribbon_mesh(objects=None, ribbon_name=""):
     """
     Quick ribbon mesh generator, no XYZ switching yet
+    # TODO AFOX plane xyz switching
+    # TODO AFOX closed loop ribbon generation
     :param objects: objects to create planes from
     :param ribbon_name: name of final created ribbon mesh
     :return: pm.PyNode of ribbon mesh
