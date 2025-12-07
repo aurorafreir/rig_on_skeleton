@@ -251,6 +251,30 @@ def weighted_floatmath_attr_connect(in_obj, out_obj, attrs: list, weight: float 
     return None
 
 
+def ribbon_mesh(objects=None, ribbon_name=""):
+    """
+    Quick ribbon mesh generator, no XYZ switching yet
+    :param objects: objects to create planes from
+    :param ribbon_name: name of final created ribbon mesh
+    :return: pm.PyNode of ribbon mesh
+    """
+    plane_meshes = []
+    for input_obj in objects:
+        plane_mesh = pm.polyPlane(sx=1, sy=1, name=f"{input_obj}_plane")
+        pm.xform(plane_mesh, matrix=pm.xform(input_obj, matrix=True, worldSpace=True, query=True), worldSpace=True)
+        plane_meshes.append(plane_mesh)
+
+    pm.polyUnite(plane_meshes, name=ribbon_name)
+    pm.delete(ribbon_name, constructionHistory=True)
+
+    for i in range(len(objects))[:-1]:
+        edge_a = (i + 1) * 4 - 2
+        edge_b = (i + 1) * 4 + 1
+        pm.polyBridgeEdge(f"{ribbon_name}.e[{edge_a}]", f"{ribbon_name}.e[{edge_b}]", divisions=0)
+
+    return pm.PyNode(ribbon_name)
+
+
 class Attr:
     def __init__(
             self,
