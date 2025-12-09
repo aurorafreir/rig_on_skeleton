@@ -263,10 +263,14 @@ def ribbon_mesh(objects:list=None, plane_rotation:list=None, plane_scale:float=1
     """
     plane_meshes = []
     for input_obj in objects:
+        # Creates a set of polyPlane meshes for each input object
+        # These will be connected afterwards, to create a mesh with flat planes at each input object
+        #   This will create more controllable deformations in the final result
         plane_mesh = pm.polyPlane(sx=1, sy=1, name=f"{input_obj}_plane")
         pm.xform(plane_mesh, rotation=plane_rotation, scale=[plane_scale, plane_scale, plane_scale])
         pm.makeIdentity(plane_mesh, apply=True)
         pm.xform(plane_mesh, matrix=pm.xform(input_obj, matrix=True, worldSpace=True, query=True), worldSpace=True)
+        # Flips mesh direction if on the negative X side
         if pm.xform(plane_mesh[0], translation=True, query=True, worldSpace=True)[0] < 0:
             pm.polyNormal(plane_mesh[0], nm=4)
             pm.makeIdentity(plane_mesh, apply=True)
@@ -276,11 +280,13 @@ def ribbon_mesh(objects:list=None, plane_rotation:list=None, plane_scale:float=1
     pm.delete(ribbon_name, constructionHistory=True)
 
     for i in range(len(objects))[:-1]:
+        # Connects the edges of the polymeshes together to make an unclosed strip
         edge_a = (i + 1) * 4 - 2
         edge_b = (i + 1) * 4 + 1
         pm.polyBridgeEdge(f"{ribbon_name}.e[{edge_a}]", f"{ribbon_name}.e[{edge_b}]", divisions=0)
 
     if closed_loop:
+        # Connects the first and final edge to create a closed loop
         final_edge_num = len(objects) * 4 - 2
         pm.polyBridgeEdge(f"{ribbon_name}.e[1]", f"{ribbon_name}.e[{final_edge_num}]", divisions=0)
 
