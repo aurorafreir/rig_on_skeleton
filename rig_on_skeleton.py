@@ -266,6 +266,10 @@ def ribbon_mesh(objects=None, ribbon_name=""):
         pm.xform(plane_mesh, rotation=plane_rotation, scale=[plane_scale, plane_scale, plane_scale])
         pm.makeIdentity(plane_mesh, apply=True)
         pm.xform(plane_mesh, matrix=pm.xform(input_obj, matrix=True, worldSpace=True, query=True), worldSpace=True)
+        if pm.xform(plane_mesh[0], translation=True, query=True, worldSpace=True)[0] < 0:
+            print(plane_mesh, plane_mesh[0])
+            pm.polyNormal(plane_mesh[0], nm=4)
+            pm.makeIdentity(plane_mesh, apply=True)
         plane_meshes.append(plane_mesh)
 
     pm.polyUnite(plane_meshes, name=ribbon_name)
