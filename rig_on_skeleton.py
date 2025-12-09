@@ -263,6 +263,8 @@ def ribbon_mesh(objects=None, ribbon_name=""):
     plane_meshes = []
     for input_obj in objects:
         plane_mesh = pm.polyPlane(sx=1, sy=1, name=f"{input_obj}_plane")
+        pm.xform(plane_mesh, rotation=plane_rotation, scale=[plane_scale, plane_scale, plane_scale])
+        pm.makeIdentity(plane_mesh, apply=True)
         pm.xform(plane_mesh, matrix=pm.xform(input_obj, matrix=True, worldSpace=True, query=True), worldSpace=True)
         plane_meshes.append(plane_mesh)
 
