@@ -169,6 +169,38 @@ def run(visual_build:bool=False):
     if visual_build:
         pm.refresh()
 
+    # -- TAIL --
+    tail_limb = ros.Limb()
+    tail_limb.limb_name = "tail"
+    tail_limb.rig_parent = rig.rig_setup_grp
+    tail_limb.ctl_parent = rig.ctls_grp
+    tail_limb.create_limb_setup()
+
+    tail_starting_int = 1
+    tail_ending_int = 8
+
+    previous_ctl_set = None
+
+    for tail_joint_num in range(tail_starting_int, tail_ending_int):
+        tail_ctl = ros.CtrlSet(
+            ctl_name=f"tail_{tail_joint_num}",
+            ctl_shape="box",
+            shape_size=5,
+            parent=hip_ctl.ctl if tail_joint_num == 1 else previous_ctl_set.ctl
+        )
+        tail_ctl.create_ctl()
+        pm.xform(tail_ctl.main_grp,
+                 matrix=pm.xform(f"tail_{tail_joint_num:02d}", matrix=True, query=True, worldSpace=True),
+                 worldSpace=True)
+
+        tail_limb.ctls.append(tail_ctl)
+        previous_ctl_set = tail_ctl
+
+    rig.limbs.append(tail_limb)
+
+    if visual_build:
+        pm.refresh()
+
     # -- SHOULDERS --
     shoulder_l = ros.Limb()
     shoulder_l.limb_name = "shoulder_l"
@@ -773,10 +805,10 @@ def run(visual_build:bool=False):
                 pm.refresh()
 
     # cleaner object names after loop-based build
-    leg_l = rig.limbs[7]
-    leg_r = rig.limbs[8]
-    hand_l = rig.limbs[9]
-    hand_r = rig.limbs[10]
+    leg_l = rig.limbs[8]
+    leg_r = rig.limbs[9]
+    hand_l = rig.limbs[10]
+    hand_r = rig.limbs[11]
 
     # -- CONTROLLER SETUP CONSTRAINTS --
     # HIPS
@@ -812,6 +844,10 @@ def run(visual_build:bool=False):
     pm.parentConstraint(neck_01.ctl, "neck_01_drv")
     pm.parentConstraint(neck_02.ctl, "neck_02_drv")
     pm.parentConstraint(head.ctl, "head_drv")
+    # TAIL
+    for i in range(tail_starting_int, tail_ending_int):
+        pm.parentConstraint(tail_limb.ctls[i-1].ctl, f"tail_{i:02d}_drv", maintainOffset=True)
+
     # SHOULDERS
     pm.parentConstraint(scap_l.ctl, "shoulder_l_drv", maintainOffset=True)
     pm.parentConstraint(scap_r.ctl, "shoulder_r_drv", maintainOffset=True)
