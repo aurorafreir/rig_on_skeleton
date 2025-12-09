@@ -255,6 +255,9 @@ def ribbon_mesh(objects:list=None, plane_rotation:list=None, plane_scale:float=1
     """
     Quick ribbon mesh generator
     :param objects: objects to create planes from
+    :param plane_rotation: Relative rotation of initially created input planes
+    :param plane_scale: Scaling of initially created planes
+    :param closed_loop: Create a closed loop ribbon mesh
     :param ribbon_name: name of final created ribbon mesh
     :return: pm.PyNode of ribbon mesh
     """
