@@ -251,10 +251,9 @@ def weighted_floatmath_attr_connect(in_obj, out_obj, attrs: list, weight: float 
     return None
 
 
-def ribbon_mesh(objects=None, ribbon_name=""):
+def ribbon_mesh(objects:list=None, plane_rotation:list=None, plane_scale:float=1, ribbon_name=""):
     """
-    Quick ribbon mesh generator, no XYZ switching yet
-    # TODO AFOX plane xyz switching
+    Quick ribbon mesh generator
     # TODO AFOX closed loop ribbon generation
     :param objects: objects to create planes from
     :param ribbon_name: name of final created ribbon mesh
@@ -267,7 +266,6 @@ def ribbon_mesh(objects=None, ribbon_name=""):
         pm.makeIdentity(plane_mesh, apply=True)
         pm.xform(plane_mesh, matrix=pm.xform(input_obj, matrix=True, worldSpace=True, query=True), worldSpace=True)
         if pm.xform(plane_mesh[0], translation=True, query=True, worldSpace=True)[0] < 0:
-            print(plane_mesh, plane_mesh[0])
             pm.polyNormal(plane_mesh[0], nm=4)
             pm.makeIdentity(plane_mesh, apply=True)
         plane_meshes.append(plane_mesh)
