@@ -251,10 +251,9 @@ def weighted_floatmath_attr_connect(in_obj, out_obj, attrs: list, weight: float 
     return None
 
 
-def ribbon_mesh(objects:list=None, plane_rotation:list=None, plane_scale:float=1, ribbon_name=""):
+def ribbon_mesh(objects:list=None, plane_rotation:list=None, plane_scale:float=1, closed_loop=False, ribbon_name=""):
     """
     Quick ribbon mesh generator
-    # TODO AFOX closed loop ribbon generation
     :param objects: objects to create planes from
     :param ribbon_name: name of final created ribbon mesh
     :return: pm.PyNode of ribbon mesh
@@ -277,6 +276,10 @@ def ribbon_mesh(objects:list=None, plane_rotation:list=None, plane_scale:float=1
         edge_a = (i + 1) * 4 - 2
         edge_b = (i + 1) * 4 + 1
         pm.polyBridgeEdge(f"{ribbon_name}.e[{edge_a}]", f"{ribbon_name}.e[{edge_b}]", divisions=0)
+
+    if closed_loop:
+        final_edge_num = len(objects) * 4 - 2
+        pm.polyBridgeEdge(f"{ribbon_name}.e[1]", f"{ribbon_name}.e[{final_edge_num}]", divisions=0)
 
     pm.delete(ribbon_name, constructionHistory=True)
 
