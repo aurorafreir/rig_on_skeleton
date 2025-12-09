@@ -274,6 +274,8 @@ def ribbon_mesh(objects=None, ribbon_name=""):
         edge_b = (i + 1) * 4 + 1
         pm.polyBridgeEdge(f"{ribbon_name}.e[{edge_a}]", f"{ribbon_name}.e[{edge_b}]", divisions=0)
 
+    pm.delete(ribbon_name, constructionHistory=True)
+
     return pm.PyNode(ribbon_name)
 
 
