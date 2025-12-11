@@ -746,6 +746,8 @@ def run(visual_build:bool=False):
         hand_side.limb_name = f"hand_{side}"
         hand_side.rig_parent = rig.rig_setup_grp
         hand_side.ctl_parent = rig.ctls_grp
+        hand_side.fk_ctls = []
+        hand_side.components = []
         hand_side.create_limb_setup()
 
         rig.limbs.append(hand_side)
@@ -757,6 +759,7 @@ def run(visual_build:bool=False):
             finger_limb.rig_parent = rig.rig_setup_grp
             finger_limb.ctl_parent = hand_side.rig_ctls_grp
             finger_limb.rig_upper_obj = hand_side.rig_ctls_grp
+            finger_limb.fk_ctls = []
             finger_limb.verbose = print_errors
             finger_limb.create_limb_setup()
 
@@ -774,6 +777,7 @@ def run(visual_build:bool=False):
             pm.xform(meta_00_ctl.main_grp,
                      matrix=pm.xform(f"{finger}_00_{side}_drv", matrix=True, query=True, worldSpace=True),
                      worldSpace=True)
+            finger_limb.fk_ctls.append(meta_00_ctl)
             meta_01_ctl = ros.CtrlSet(
                 ctl_name=f"{finger}_01_{side}",
                 ctl_shape="box",
@@ -787,6 +791,7 @@ def run(visual_build:bool=False):
             pm.xform(meta_01_ctl.main_grp,
                      matrix=pm.xform(f"{finger}_01_{side}_drv", matrix=True, query=True, worldSpace=True),
                      worldSpace=True)
+            finger_limb.fk_ctls.append(meta_01_ctl)
             meta_02_ctl = ros.CtrlSet(
                 ctl_name=f"{finger}_02_{side}",
                 ctl_shape="box",
@@ -800,6 +805,9 @@ def run(visual_build:bool=False):
             pm.xform(meta_02_ctl.main_grp,
                      matrix=pm.xform(f"{finger}_02_{side}_drv", matrix=True, query=True, worldSpace=True),
                      worldSpace=True)
+            finger_limb.fk_ctls.append(meta_02_ctl)
+
+            hand_side.components.append(finger_limb)
 
             if visual_build:
                 pm.refresh()
@@ -871,6 +879,12 @@ def run(visual_build:bool=False):
     pm.parentConstraint(leg_r.skin_joints[2], "ankle_r_drv")
     pm.parentConstraint(leg_r.skin_joints[3], "foot_r_drv")
     pm.parentConstraint(leg_r.ik_ctl.ctl, leg_r.ik_pv_ctl.main_grp, maintainOffset=True)  # TEMP UNTIL SPACE SWITCH WORKS
+
+    # FINGERS
+    for side in hand_l, hand_r:
+        for finger in side.components:  # Thumb, index, middle, ring, pinky
+            for finger_ctl in finger.fk_ctls:  # meta 01, meta 02, meta 03
+                pm.parentConstraint(finger_ctl.ctl, f"{finger_ctl.ctl_name}_drv", maintainOffset=True)
 
     # -- ATTRIBUTE FINALISING/LOCKING/HIDING --
     # HIPS
