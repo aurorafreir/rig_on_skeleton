@@ -113,48 +113,6 @@ def lock_hide_default_attrs(
     return None
 
 
-def set_up_space_switching(
-        driver_obj: pm.nt.Transform,
-        attr: str,
-        driven_obj: pm.nt.Transform,
-        space_objects: list,
-):
-    """
-
-    :param driver_obj:
-    :param attr:
-    :param driven_obj:
-    :param space_objects:
-    :return:
-    """
-
-    # TODO AFOX
-
-    return None
-
-
-def set_up_space_switch(self):
-    """
-    Takes an input object (usually a special SpaceSwitch group, then creates locators for each of the input spaces,
-        then takes a given input attribute,
-    :return:
-    """
-
-    if not self.spaces:
-        raise Exception(f"no spaces set in {self.ctl_name} spaces flag")
-
-    for index, attr_name, input_obj in enumerate(self.spaces):
-        loc = pm.spaceLocator(name=f"{self.ctl_name}_{input_obj}_ss_loc")
-        pm.xform(
-            loc,
-            matrix=pm.xform(input_obj, matrix=True, worldSpace=True, query=True),
-            worldSpace=True,
-        )
-        pass
-
-    return None
-
-
 def fkik_quat_setup(
         name: str,
         input_obj_a=pm.nt.Transform,
