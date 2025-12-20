@@ -266,6 +266,7 @@ class Attr:
             dummy_attr=False,
             float_min=None,
             float_max=None,
+            enum_values=None,
             proxy_objects=None,
     ):
 
@@ -283,6 +284,8 @@ class Attr:
 
         self.float_min = float_min
         self.float_max = float_max
+
+        self.enum_values = enum_values
 
         self.proxy_objects = proxy_objects if proxy_objects else []
 
@@ -302,6 +305,11 @@ class Attr:
                 "attributeType": "float",
                 "minValue": self.float_min,
                 "maxValue": self.float_max,
+            }
+        elif self.attr_type == "enum":
+            kwargs = {
+                "attributeType": "enum",
+                "enumName": self.enum_values,  # idk why this is called enumName instead of enumValues or w/e but okay
             }
         if self.dummy_attr:
             kwargs = {"attributeType": "enum", "enumName": "-----:"}
