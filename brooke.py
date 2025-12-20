@@ -818,6 +818,14 @@ def run(visual_build:bool=False):
     hand_l = rig.limbs[10]
     hand_r = rig.limbs[11]
 
+    # -- SPACE SWITCHING --
+    eye_lookat_main_spaceswitch = ros.SpaceSwitching()
+    eye_lookat_main_spaceswitch.rig = rig
+    eye_lookat_main_spaceswitch.ctrlset_to_affect = eye_lookat_main
+    eye_lookat_main_spaceswitch.driver_ctrlsets = [root_ctl, head]
+    eye_lookat_main_spaceswitch.driver_obj = eye_lookat_main
+    eye_lookat_main_spaceswitch.create_space_switching()
+
     # -- CONTROLLER SETUP CONSTRAINTS --
     # HIPS
 
