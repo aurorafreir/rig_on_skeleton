@@ -637,6 +637,7 @@ class Rig:
         self.main_grp = ""
         self.rig_setup_grp = "rig_setup"
         self.ctls_grp = "ctls"
+        self.spaceswitch_grp = "spaceswitch"
         self.extracted_ctls_grp = "extracted_ctls"
         self.extracted_control_suffix = "extracted"
 
@@ -672,6 +673,10 @@ class Rig:
         # Ctls group
         self.ctls_grp = create_grp_if_nonexistant(self.ctls_grp)
         pm.parent(self.ctls_grp, self.main_grp)
+
+        # SpaceSwitch group
+        self.spaceswitch_grp = create_grp_if_nonexistant(self.spaceswitch_grp)
+        pm.parent(self.spaceswitch_grp, self.main_grp)
 
         # Driver node
         self.driver_main_node = create_grp_if_nonexistant(self.driver_main_node)
@@ -729,6 +734,60 @@ class Rig:
             extracted_ctls.append(dup[0])
 
         return extracted_ctls
+
+
+class SpaceSwitching:
+    def __init__(self):
+        self.rig: Rig = None,
+        self.ctrlset_to_affect: CtrlSet = None,
+        self.driver_ctrlsets: list[CtrlSet] = None,
+        self.driver_obj: CtrlSet = None,
+
+        self.locators: list = None,
+        self.spaceswitch_attr: Attr = None,
+
+    def create_space_switching(self):
+        """
+        Creates a space switching relationship between given CtrlSets
+        # TODO AFOX: comment and documentation
+        :return: None
+        """
+        ss_grp = pm.group(name=f"{self.ctrlset_to_affect.ctl_name}_spaceswitch", parent=self.rig.spaceswitch_grp)
+
+        self.locators = []
+
+        for ctrlset in self.driver_ctrlsets:
+            loc = pm.spaceLocator(name=f"{ctrlset.ctl_name}_{self.ctrlset_to_affect.ctl_name}_space_loc")
+            pm.xform(loc, matrix=pm.xform(self.ctrlset_to_affect.ctl, matrix=True, query=True, worldSpace=True), worldSpace=True)
+
+            pm.parent(loc, ss_grp)
+
+            pm.parentConstraint(ctrlset.ctl, loc, maintainOffset=True)
+
+            self.locators.append(loc)
+
+        enum_values = ":".join([ctrlset.ctl_name for ctrlset in self.driver_ctrlsets])
+
+        self.spaceswitch_attr = Attr(main_object=self.driver_obj.ctl,
+                                    attr_name="spaces",
+                                    nice_name="Spaces",
+                                    driver_prefix=self.ctrlset_to_affect.ctl_name,
+                                    attr_type="enum",
+                                    enum_values=enum_values,
+                                    )
+        self.spaceswitch_attr.create_attr()
+
+        spaceswitch_parent_const = pm.parentConstraint(self.locators, self.ctrlset_to_affect.spaceswitch_grp)
+
+        for index, loc in enumerate(self.locators):
+            condition_node = pm.createNode("condition")
+            condition_node.colorIfTrue.set(1,1,1)
+            condition_node.colorIfFalse.set(0,0,0)
+            pm.PyNode("DRIVER").attr(f"{self.ctrlset_to_affect.ctl_name}_spaces") >> condition_node.firstTerm
+            condition_node.secondTerm.set(index)
+            condition_node.outColorR >> spaceswitch_parent_const.attr(f"{loc}W{index}")
+
+        return None
 
 
 class Limb:
