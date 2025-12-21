@@ -812,6 +812,104 @@ def run(visual_build:bool=False):
             if visual_build:
                 pm.refresh()
 
+    # -- FACE --
+    face = ros.Limb()
+    face.limb_name = f"face"
+    face.rig_parent = rig.rig_setup_grp
+    face.ctl_parent = rig.ctls_grp
+    face.create_limb_setup()
+
+    # THIS EYE SETUP WILL BE REPLACED WITH A rig_on_skeleton.py COMPONENT AFTER IT IS FIGURED OUT
+    # eyes
+    eye_l = ros.CtrlSet(
+        ctl_name="eye_l",
+        ctl_shape="sphere",
+        shape_size=4,
+        parent=face.rig_ctls_grp,
+        colour=ros.left_col,
+        offset=True,
+        spaceswitch=True,
+    )
+    eye_l.create_ctl()
+    pm.xform(eye_l.main_grp, matrix=pm.xform("eye_l", matrix=True, query=True, worldSpace=True), worldSpace=True)
+
+    eye_l_lookat = ros.CtrlSet(
+        ctl_name="eye_l_lookat",
+        ctl_shape="circle",
+        shape_size=2,
+        parent=face.rig_ctls_grp,
+        colour=ros.left_col,
+        offset=True,
+        spaceswitch=True,
+    )
+    eye_l_lookat.create_ctl()
+    pm.xform(eye_l_lookat.main_grp, t=pm.xform("eye_l", t=True, query=True, worldSpace=True), worldSpace=True)
+    pm.xform(eye_l_lookat.main_grp, t=[0,0,40], worldSpace=True, relative=True)
+    pm.xform(eye_l_lookat.ctl, rotation=[90,0,0])
+    pm.makeIdentity(eye_l_lookat.ctl, apply=True)
+
+    pm.aimConstraint(eye_l_lookat.ctl, eye_l.offset_grp, maintainOffset=True, worldUpType="objectrotation", worldUpObject=head.ctl)
+    pm.parentConstraint(head.ctl, eye_l.main_grp, maintainOffset=True)
+
+    if visual_build:
+        pm.refresh()
+
+    eye_r = ros.CtrlSet(
+        ctl_name="eye_r",
+        ctl_shape="sphere",
+        shape_size=4,
+        parent=face.rig_ctls_grp,
+        colour=ros.right_col,
+        offset=True,
+        spaceswitch=True,
+    )
+    eye_r.create_ctl()
+    pm.xform(eye_r.main_grp, matrix=pm.xform("eye_r", matrix=True, query=True, worldSpace=True), worldSpace=True)
+
+    eye_r_lookat = ros.CtrlSet(
+        ctl_name="eye_r_lookat",
+        ctl_shape="circle",
+        shape_size=2,
+        parent=face.rig_ctls_grp,
+        colour=ros.right_col,
+        offset=True,
+        spaceswitch=True,
+    )
+    eye_r_lookat.create_ctl()
+    pm.xform(eye_r_lookat.main_grp, t=pm.xform("eye_r", t=True, query=True, worldSpace=True), worldSpace=True)
+    pm.xform(eye_r_lookat.main_grp, t=[0, 0, 40], worldSpace=True, relative=True)
+    pm.xform(eye_r_lookat.ctl, rotation=[90, 0, 0])
+    pm.makeIdentity(eye_r_lookat.ctl, apply=True)
+
+    pm.aimConstraint(eye_r_lookat.ctl, eye_r.offset_grp, maintainOffset=True, worldUpType="objectrotation", worldUpObject=head.ctl)
+    pm.parentConstraint(head.ctl, eye_r.main_grp, maintainOffset=True)
+
+    if visual_build:
+        pm.refresh()
+
+    eye_lookat_main = ros.CtrlSet(
+        ctl_name="eye_lookat_main",
+        ctl_shape="square",
+        shape_size=[8,3,3],
+        parent=face.rig_ctls_grp,
+        colour=ros.centre_col,
+        offset=True,
+        spaceswitch=True,
+    )
+    eye_lookat_main.create_ctl()
+    eye_lookat_temp_cns = pm.pointConstraint(eye_r_lookat.ctl, eye_l_lookat.ctl, eye_lookat_main.main_grp)
+    pm.xform(eye_lookat_main.ctl, rotation=[-90, 0, 0])
+    pm.makeIdentity(eye_lookat_main.ctl, apply=True)
+    pm.delete(eye_lookat_temp_cns)
+
+    pm.parentConstraint(eye_lookat_main.ctl, eye_l_lookat.main_grp, maintainOffset=True)
+    pm.parentConstraint(eye_lookat_main.ctl, eye_r_lookat.main_grp, maintainOffset=True)
+
+    if visual_build:
+        pm.refresh()
+
+    rig.limbs.append(face)  # 13
+
     # cleaner object names after loop-based build
     leg_l = rig.limbs[8]
     leg_r = rig.limbs[9]
@@ -904,6 +1002,10 @@ def run(visual_build:bool=False):
         for finger in side.components:  # Thumb, index, middle, ring, pinky
             for finger_ctl in finger.fk_ctls:  # meta 01, meta 02, meta 03
                 pm.parentConstraint(finger_ctl.ctl, f"{finger_ctl.ctl_name}_drv", maintainOffset=True)
+
+    # FACE
+    pm.parentConstraint(eye_l.ctl, "eye_l_drv")
+    pm.parentConstraint(eye_r.ctl, "eye_r_drv")
 
     # -- ATTRIBUTE FINALISING/LOCKING/HIDING --
     # HIPS
