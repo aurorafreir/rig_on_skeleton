@@ -817,8 +817,8 @@ class Limb:
 
         self.input_joints: list = None,
         self.ikfk_suffix_replace: str = "_drv",
-        self.ik_ctl: pm.nt.Transform = None,
-        self.ik_pv_ctl: pm.nt.Transform = None,
+        self.ik_ctl: CtrlSet = None,
+        self.ik_pv_ctl: CtrlSet = None,
         self.fk_ctls: list = None,
         self.driver_ctl: CtrlSet = None,
 
