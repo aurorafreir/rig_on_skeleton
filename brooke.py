@@ -819,12 +819,23 @@ def run(visual_build:bool=False):
     hand_r = rig.limbs[11]
 
     # -- SPACE SWITCHING --
-    eye_lookat_main_spaceswitch = ros.SpaceSwitching()
-    eye_lookat_main_spaceswitch.rig = rig
-    eye_lookat_main_spaceswitch.ctrlset_to_affect = eye_lookat_main
-    eye_lookat_main_spaceswitch.driver_ctrlsets = [root_ctl, head]
-    eye_lookat_main_spaceswitch.driver_obj = eye_lookat_main
+    eye_lookat_main_spaceswitch = ros.SpaceSwitching(rig=rig, ctrlset_to_affect=eye_lookat_main,
+                                                     driver_ctrlsets=[root_ctl, head], driver_obj=eye_lookat_main)
     eye_lookat_main_spaceswitch.create_space_switching()
+    # LEGS IK
+    leg_l_ik_spaceswitch = ros.SpaceSwitching(rig=rig, ctrlset_to_affect=leg_l.ik_ctl,
+                                                driver_ctrlsets=[root_ctl, hip_ctl], driver_obj=leg_l.ik_ctl)
+    leg_l_ik_spaceswitch.create_space_switching()
+    leg_r_ik_spaceswitch = ros.SpaceSwitching(rig=rig, ctrlset_to_affect=leg_r.ik_ctl,
+                                                driver_ctrlsets=[root_ctl, hip_ctl], driver_obj=leg_r.ik_ctl)
+    leg_r_ik_spaceswitch.create_space_switching()
+    # ARMS IK
+    arm_l_ik_spaceswitch = ros.SpaceSwitching(rig=rig, ctrlset_to_affect=arm_l.ik_ctl,
+                                              driver_ctrlsets=[root_ctl, hip_ctl, scap_l], driver_obj=arm_l.ik_ctl)
+    arm_l_ik_spaceswitch.create_space_switching()
+    arm_r_ik_spaceswitch = ros.SpaceSwitching(rig=rig, ctrlset_to_affect=arm_r.ik_ctl,
+                                              driver_ctrlsets=[root_ctl, hip_ctl, scap_r], driver_obj=arm_r.ik_ctl)
+    arm_r_ik_spaceswitch.create_space_switching()
 
     # -- CONTROLLER SETUP CONSTRAINTS --
     # HIPS

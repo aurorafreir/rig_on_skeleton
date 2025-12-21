@@ -745,37 +745,45 @@ class Rig:
 
 
 class SpaceSwitching:
-    def __init__(self):
-        self.rig: Rig = None,
-        self.ctrlset_to_affect: CtrlSet = None,
-        self.driver_ctrlsets: list[CtrlSet] = None,
-        self.driver_obj: CtrlSet = None,
+    def __init__(self,
+                 rig:Rig=None,
+                 ctrlset_to_affect:CtrlSet=None,
+                 driver_ctrlsets:list[CtrlSet]=None,
+                 driver_obj:CtrlSet=None
+                 ):
+        self.rig: Rig = rig
+        self.ctrlset_to_affect: CtrlSet = ctrlset_to_affect
+        self.driver_ctrlsets: list[CtrlSet] = driver_ctrlsets
+        self.driver_obj: CtrlSet = driver_obj
 
-        self.locators: list = None,
-        self.spaceswitch_attr: Attr = None,
+        self.locators: list = None
+        self.spaceswitch_attr: Attr = None
 
     def create_space_switching(self):
         """
         Creates a space switching relationship between given CtrlSets
-        # TODO AFOX: comment and documentation
+        # TODO AFOX: Seperate orient, point, and parent constraint setups
         :return: None
         """
-        ss_grp = pm.group(name=f"{self.ctrlset_to_affect.ctl_name}_spaceswitch", parent=self.rig.spaceswitch_grp)
-
+        # setup of spaceswitch object group
+        spaceswitch_grp = pm.group(name=f"{self.ctrlset_to_affect.ctl_name}_spaceswitch",
+                                   parent=self.rig.spaceswitch_grp,
+                                   empty=True)
         self.locators = []
 
         for ctrlset in self.driver_ctrlsets:
+            # Create a locator for each driver_ctrlset control, move it to the ctrlset_to_affect worldspace position,
+            #   and parent to the spaceswitch group
             loc = pm.spaceLocator(name=f"{ctrlset.ctl_name}_{self.ctrlset_to_affect.ctl_name}_space_loc")
             pm.xform(loc, matrix=pm.xform(self.ctrlset_to_affect.ctl, matrix=True, query=True, worldSpace=True), worldSpace=True)
-
-            pm.parent(loc, ss_grp)
+            pm.parent(loc, spaceswitch_grp)
 
             pm.parentConstraint(ctrlset.ctl, loc, maintainOffset=True)
 
             self.locators.append(loc)
 
+        # Create enum attribute on self.driver_obj
         enum_values = ":".join([ctrlset.ctl_name for ctrlset in self.driver_ctrlsets])
-
         self.spaceswitch_attr = Attr(main_object=self.driver_obj.ctl,
                                     attr_name="spaces",
                                     nice_name="Spaces",
@@ -785,7 +793,7 @@ class SpaceSwitching:
                                     )
         self.spaceswitch_attr.create_attr()
 
-        spaceswitch_parent_const = pm.parentConstraint(self.locators, self.ctrlset_to_affect.spaceswitch_grp)
+        spaceswitch_parent_const = pm.parentConstraint(self.locators, self.ctrlset_to_affect.spaceswitch_grp, maintainOffset=True)
 
         for index, loc in enumerate(self.locators):
             condition_node = pm.createNode("condition")
