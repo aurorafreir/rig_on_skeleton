@@ -669,7 +669,6 @@ class Rig:
             Can also be re-run at any point.
         :return: None
         """
-        print(f"{time.perf_counter()}: started ensure_setup_is_correct().")
 
         # Main rig group
         self.main_grp = create_grp_if_nonexistant(self.main_grp)
@@ -698,7 +697,6 @@ class Rig:
         self.temp_rig_grp = create_grp_if_nonexistant(self.temp_rig_grp)
         pm.parent(self.temp_rig_grp, self.rig_setup_grp)
 
-        print(f"{time.perf_counter():.2}: finished ensure_setup_is_correct().")
 
         return None
 
